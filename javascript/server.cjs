@@ -17,20 +17,18 @@ const app = express();
 app.use(cors()); // Para permitir solicitudes de dominios cruzados
 app.use(express.json()); // Para poder manejar datos JSON
 
-app.use(express.static(path.join(__dirname, '..', 'html')));  // Serve HTML files
-app.use(express.static(path.join(__dirname, '..', 'css')));   // Serve CSS files
-app.use(express.static(path.join(__dirname, '..', 'javascript'))); // Serve JS files
-
-// Routes
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'html', 'index.html'));
+app.use("/css", express.static(path.join(__dirname, "../css"))); // ruta para archivos CSS
+app.use("/javascript", express.static(path.join(__dirname, "../javascript"))); // ruta para archivos JS
+app.use("/html", express.static(path.join(__dirname, "../html"))); // ruta para archivos JS
+app.use("/imagenes", express.static(path.join(__dirname, "../imagenes"))); // ruta para archivos JS
+// Ruta raíz (cuando entras al dominio)
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../html/index.html"));
 });
 
 app.get('/Principal.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'html', 'Principal.html'));
+  res.sendFile(path.join(__dirname, "../html/Principal.html"));
 });
-app.use("/imagenes", express.static(path.join(__dirname, "../imagenes"))); // ruta para archivos JS
-// Ruta raíz (cuando entras al dominio)
 
 // Conexión a la base de datos PostgreSQL
 const pool = new Pool({
