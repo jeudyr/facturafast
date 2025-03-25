@@ -5,6 +5,7 @@ console.log("DB Host:", process.env.DB_HOST);
 console.log("DB User:", process.env.DB_USER);
 console.log("DB Password:", process.env.DB_PASSWORD);
 console.log("DB Name:", process.env.DB_NAME);
+
 const express = require("express");
 const mysql = require('mysql2');
 const cors = require("cors");
@@ -45,12 +46,13 @@ db.connect(err => {
 });
 
 // Puerto dinámico para Render (o 3000 si estamos en local)
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000; // Render asignará el puerto automáticamente
 
 // Iniciar el servidor
 app.listen(port, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${port}`);
 });
+
 
 // LOGIN
 app.post("/login", (req, res) => {
