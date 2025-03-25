@@ -280,7 +280,7 @@ function agregarFactura(event) {
         return;
     }
 
-    let ProductoSeleccionado = productos.find(p => p.idProducto == id);
+    let ProductoSeleccionado = productos.find(p => p.idproducto == id);
 
     if (!ProductoSeleccionado) {
         alert("Error: Producto no encontrado en el inventario.");
@@ -296,10 +296,10 @@ function agregarFactura(event) {
     li.innerHTML = `
         ${ProductoSeleccionado.nombre} - ${ProductoSeleccionado.descripcion} | Cantidad: ${cantidad} | Precio: $${(ProductoSeleccionado.precio * cantidad).toFixed(2)}
         <span class="button-container">
-            <button class="edit-button btn btn-edit" onclick="editProductFacturacion(${ProductoSeleccionado.idProducto})">
+            <button class="edit-button btn btn-edit" onclick="editProductFacturacion(${ProductoSeleccionado.idproducto})">
                 📝
             </button>
-            <button class="delete-button btn btn-delete" onclick="eliminarProductoFacturacion(${ProductoSeleccionado.idProducto})">
+            <button class="delete-button btn btn-delete" onclick="eliminarProductoFacturacion(${ProductoSeleccionado.idproducto})">
                 🗑️
             </button>
         </span>
@@ -319,7 +319,7 @@ listaFacturacion.appendChild(li);
 }
 
 function editProductFacturacion(id) {
-    let ProductoSeleccionado = productosFacturar.find(p => p.idProducto == id);
+    let ProductoSeleccionado = productosFacturar.find(p => p.idproducto == id);
 
     if (!ProductoSeleccionado) {
         alert("Error: Producto no encontrado en la factura.");
@@ -332,7 +332,7 @@ function editProductFacturacion(id) {
         alert("⚠️ Cantidad inválida. Intente de nuevo.");
         return;
     }
-    let ProductoSeleccionado2 = productos.find(p => p.idProducto == id)
+    let ProductoSeleccionado2 = productos.find(p => p.idproducto == id)
     if (nuevaCantidad > ProductoSeleccionado2.cantidad) {
         alert("⚠️ La cantidad no puede exceder el inventario disponible.");
         return;
@@ -355,7 +355,7 @@ function eliminarProductoFacturacion(id) {
     let totalAmount = parseFloat(totalAmountElement.textContent) || 0;
 
     // Buscar el índice del producto en la lista
-    let index = productosFacturar.findIndex(p => p.idProducto == id);
+    let index = productosFacturar.findIndex(p => p.idproducto == id);
 
     if (index === -1) {
         alert("Error: Producto no encontrado en la factura.");
@@ -426,7 +426,7 @@ async function generarFactura() {
 
     let facturaUltima = await obtenerUltimaFactura.json();
     if (facturaUltima.length > 0) {
-        fkFactura = facturaUltima[0].idFactura;
+        fkFactura = facturaUltima[0].idfactura;
     } else {
         alert("Error: No se encontró la última factura generada.");
         return;
@@ -436,10 +436,10 @@ async function generarFactura() {
     let productosFactura = []; // Para enviar al PDF
 
     for (let producto of productosFacturar) {
-        let ProductoSeleccionado = productos.find(p => p.idProducto == producto.idProducto);
+        let ProductoSeleccionado = productos.find(p => p.idproducto == producto.idproducto);
         let cantidad = producto.cantidad;
         let monto = producto.precio * cantidad;
-        let idTemp = producto.idProducto;
+        let idTemp = producto.idproducto;
         let nuevaCantidadDisponible = Math.round(ProductoSeleccionado.cantidad - cantidad);
         
         // **4️⃣ Actualizar la cantidad en el inventario**
@@ -526,13 +526,13 @@ function cargarFacturas() {
             if (filtro === "todas") {
                 data.forEach(factura => {
                     let li = document.createElement("li");
-                    li.textContent = `Factura #${factura.idFactura} - Total: $${factura.montoTotal} - Fecha: ${factura.fecha}`;
+                    li.textContent = `Factura #${factura.idfactura} - Total: $${factura.montoTotal} - Fecha: ${factura.fecha}`;
                     invoiceRecords.appendChild(li);
                 });
             } else if (filtro === "masVendidos") {
                 data.forEach(producto => {
                     let li = document.createElement("li");
-                    li.textContent = `Producto: ${producto.nombre} - Vendidos: ${producto.totalVendido}`;
+                    li.textContent = `Producto: ${producto.nombre} - Vendidos: ${producto.totalvendido}`;
                     invoiceRecords.appendChild(li);
                 });
             } else if (filtro === "mensual" || filtro === "semanal") {
