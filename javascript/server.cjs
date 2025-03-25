@@ -7,7 +7,7 @@ console.log("DB Password:", process.env.DB_PASSWORD);
 console.log("DB Name:", process.env.DB_NAME);
 
 const express = require("express");
-const mysql = require('mysql2');
+const { Pool } = require('pg'); // Usamos el paquete `pg` para PostgreSQL
 const cors = require("cors");
 const path = require("path");
 
@@ -17,39 +17,37 @@ const app = express();
 app.use(cors()); // Para permitir solicitudes de dominios cruzados
 app.use(express.json()); // Para poder manejar datos JSON
 
-
-
 // Ruta raíz (cuando entras al dominio)
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../html/index.html"));
 });
 
-// Conexión a la base de datos MySQL (usando mysql2 para compatibilidad)
-const db = mysql.createConnection({
+// Conexión a la base de datos PostgreSQL
+const pool = new Pool({
   host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  connectTimeout: 10000,  // 10 segundos de tiempo de espera para la conexión
-  authPlugins: {
-    mysql_native_password: () => require('mysql2/lib/auth/mysql_native_password')
+  ssl: {
+    rejectUnauthorized: false // Para conexiones externas como Render
   }
 });
 
-db.connect(err => {
+pool.connect((err, client, release) => {
   if (err) {
-    console.error("Error en la conexión a la BD:", err);
+    console.error("Error en la conexión a la BD:", err.stack);
     return;
   }
-  console.log("Conexión exitosa a la base de datos");
+  console.log("✅ Conexión exitosa a la base de datos");
+  release();
 });
 
 // Puerto dinámico para Render (o 3000 si estamos en local)
-const port = process.env.PORT || 10000;
+const port = process.env.PORT || 1000;
 
-// Iniciar el servidor
 app.listen(port, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${port}`);
+  console.log(`Servidor corriendo en el puerto ${port}`);
 });
 
 
