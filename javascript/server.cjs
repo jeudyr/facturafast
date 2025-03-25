@@ -46,7 +46,7 @@ db.connect(err => {
 });
 
 // Puerto dinámico para Render (o 3000 si estamos en local)
-const port = process.env.PORT || 3000; // Render asignará el puerto automáticamente
+const port = process.env.PORT || 10000;
 
 // Iniciar el servidor
 app.listen(port, () => {
