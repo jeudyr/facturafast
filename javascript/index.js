@@ -6,7 +6,7 @@ document.getElementById('login').addEventListener('submit', function(event) {
 
     console.log("🔍 Datos a enviar:", { usuario, contrasena });
 
-    fetch("http://localhost:3000/login", {
+    fetch("https://facturafast.onrender.com/login", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
