@@ -2,32 +2,23 @@ require('dotenv').config();
 const express = require("express");
 const mysql = require('mysql2');
 const cors = require("cors");
-const fs = require("fs");
 const path = require("path");
+
+const app = express();
+
+// Inicialización de middlewares
+app.use(cors()); // Para permitir solicitudes de dominios cruzados
+app.use(express.json()); // Para poder manejar datos JSON
 
 // Servir archivos estáticos desde la carpeta "html"
 app.use(express.static(path.join(__dirname, "../html")));
 
-// Cuando el usuario entra a "/", enviar index.html
+// Ruta raíz (cuando entras al dominio)
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../html/index.html"));
 });
-const PDFDocument = require("pdfkit");
-const brevo = require('@getbrevo/brevo');
 
-// Inicialización
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-// Configurar Brevo
-const apiInstance = new brevo.TransactionalEmailsApi();
-apiInstance.setApiKey(
-  brevo.TransactionalEmailsApiApiKeys.apiKey,
-  process.env.BREVO_API_KEY
-);
-
-// Configuración de la BD
+// Conexión a la base de datos MySQL (usando mysql2 para compatibilidad)
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
@@ -38,10 +29,18 @@ const db = mysql.createConnection({
 
 db.connect(err => {
   if (err) {
-    console.error("❌ Error en la conexión a la BD:", err);
-  } else {
-    console.log("✅ Conexión exitosa a la base de datos");
+    console.error("Error en la conexión a la BD:", err);
+    return;
   }
+  console.log("Conexión exitosa a la base de datos");
+});
+
+// Puerto dinámico para Render (o 3000 si estamos en local)
+const port = process.env.PORT || 3000;
+
+// Iniciar el servidor
+app.listen(port, () => {
+  console.log(`🚀 Servidor corriendo en http://localhost:${port}`);
 });
 
 // LOGIN
@@ -273,10 +272,6 @@ app.get("/ventasSemanales", (_, res) => {
     if (err) return res.status(500).json({ error: "Error" });
     res.json(results);
   });
-});
-
-app.listen(3000, () => {
-  console.log("🚀 Servidor corriendo en http://localhost:3000");
 });
 
 
