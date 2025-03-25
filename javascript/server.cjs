@@ -17,6 +17,8 @@ const app = express();
 app.use(cors()); // Para permitir solicitudes de dominios cruzados
 app.use(express.json()); // Para poder manejar datos JSON
 
+app.use("/javascript", express.static(path.join(__dirname, 'javascript')));
+app.use("/css", express.static(path.join(__dirname, 'css')));
 // Ruta raíz (cuando entras al dominio)
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../html/index.html"));
