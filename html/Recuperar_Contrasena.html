@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <script defer src="../javascript/RecuperarContrasena.js"></script>
+</head>
+<body>
+    <div class="recuperar-contenedor">
+        <h1>Recuperación de Contraseña</h1>
+        <p id="descripcion">
+            Se enviará un correo a su dirección con los pasos a seguir para recuperar la contraseña.
+        </p>
+        <div class="formulario">
+            <form id="formularioRecuperacion">
+                <input type="email" id="correo" placeholder="Correo Electrónico">
+                <button type="submit" class="enviar">ENVIAR</button>
+            </form>
+            <div id="codigo-container"></div>
+        </div>
+    </div>
+</body>
+</html>

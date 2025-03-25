@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facturación - Sistema</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <script defer src="../javascript/Principal..js"></script>
+</head>
+<body>
+    <div class="user-info">
+        <span>Usuario: <strong id="userRoleDisplay">Admin</strong></span>
+        <label id="loggedInUserLabel"></label> 
+        <button onclick="changeUserRole()">Cambiar Rol</button>
+    </div>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-button active" id="productosTab" onclick="changeTab('productos')">Productos</button>
+            <button class="tab-button" onclick="changeTab('facturacion')">Facturación</button>
+            <button class="tab-button" onclick="changeTab('registros')">Registros</button>
+        </div>
+
+        <div class="content">
+            <!-- GESTIÓN DE PRODUCTOS -->
+            <div id="productos" class="tab-content active">
+                <h2>Gestión de Productos</h2>
+                <form id="productForm">
+                    <input type="text" id="productName" placeholder="Nombre del Producto" required>
+                    <input type="text" id="productDescription" placeholder="Descripción" required>
+                    <input type="number" id="productQuantity" placeholder="Cantidad" required>
+                    <input type="number" id="productPrice" placeholder="Precio" required>
+                    <button type="submit">Agregar Producto</button>
+                </form>
+                <h3>Inventario</h3>
+                <ul id="productList"></ul>
+            </div>
+
+            <!-- FACTURACIÓN -->
+            <div id="facturacion" class="tab-content">
+                <h2>Facturación</h2>
+                <form id="invoiceForm">
+                    <select id="productSelect">
+                        <option value="">Seleccione un producto</option>
+                    </select>
+                    <input type="number" id="cantidadFacturacion" placeholder="Cantidad" required>
+                    <button type="submit">Añadir a Factura</button>
+                </form>
+                <h3>Productos en la Factura</h3>
+                <ul id="listaFacturacion"></ul>
+                <h3>Total: $<span id="totalAmount">0.00</span></h3>
+                <button onclick="generarFactura()">Generar Factura</button>
+            </div>
+
+            <!-- REGISTRO DE FACTURAS -->
+            <div id="registros" class="tab-content">
+                <h2>Registros de Facturas</h2>
+
+                <!-- Filtro para ver diferentes reportes -->
+                <label for="filtroFacturas">Seleccionar reporte:</label>
+                <select id="filtroFacturas" onchange="cargarFacturas()">
+                    <option value="todas">Ver todas las facturas</option>
+                    <option value="masVendidos">Mayor producto vendido</option>
+                    <option value="mensual">Ventas totales por mes</option>
+                    <option value="semanal">Ventas totales por semana</option>
+                </select>
+
+                <!-- Aquí se mostrarán los resultados -->
+                <ul id="invoiceRecords"></ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
