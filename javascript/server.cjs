@@ -24,8 +24,12 @@ app.get("/", (req, res) => {
 
 // Conexión a la base de datos PostgreSQL
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl:TRUE
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: { rejectUnauthorized: false },  // Si tu conexión requiere SSL
 });
 
 pool.connect((err, client, release) => {
