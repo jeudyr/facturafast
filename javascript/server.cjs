@@ -18,7 +18,7 @@ app.use(cors()); // Para permitir solicitudes de dominios cruzados
 app.use(express.json()); // Para poder manejar datos JSON
 
 
-
+app.use(express.static(path.join(__dirname, 'facturafast')));
 // Ruta raíz (cuando entras al dominio)
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../html/index.html"));
