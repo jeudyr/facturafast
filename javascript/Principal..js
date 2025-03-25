@@ -182,6 +182,7 @@ function updateProductList() {
     })
     .then(response => response.json())
     .then(results => {
+        console.log("Resultados obtenidos del servidor:", results);  // Para ver la estructura
         productosLista.innerHTML = ""; 
         results.forEach((product) => {
             let li = document.createElement("li");

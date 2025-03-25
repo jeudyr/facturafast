@@ -191,8 +191,11 @@ app.post("/productos", (req, res) => {
   const { usuario } = req.body;
   pool
     .query("SELECT * FROM productos WHERE usuario = $1", [usuario])
-    .then((results) => res.json(results.rows))
-    .catch((err) => res.status(500).json({ error: "Error al obtener productos" }));
+    .then((results) => {
+      console.log("Productos obtenidos:", results.rows);  // Agregar para depuración
+      res.json(results.rows);
+    })
+    .catch((err) => res.status(500).json({ error: "Error al obtener productos", details: err }));
 });
 
 app.post("/editarMostrar", (req, res) => {
