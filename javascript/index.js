@@ -1,35 +1,33 @@
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('login').addEventListener('submit', function(event) {
-        event.preventDefault(); // Evitar recargar la página
+document.getElementById('login').addEventListener('submit', function(event) {
+    event.preventDefault(); // Evitar recargar la página
 
-        let usuario = document.getElementById('usuario').value;
-        let contrasena = document.getElementById('contrasena').value;
+    let usuario = document.getElementById('usuario').value;
+    let contrasena = document.getElementById('contrasena').value;
 
-        console.log("🔍 Datos a enviar:", { usuario, contrasena });
+    console.log("🔍 Datos a enviar:", { usuario, contrasena });
 
-        fetch("http://localhost:3000/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                usuario: usuario,
-                contrasena: contrasena
-            })
+    fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            usuario: usuario,
+            contrasena: contrasena
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {       
-                // Guardar usuario en localStorage para usarlo en la otra página
-                localStorage.setItem("loggedInUser", data.user.usuario);
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {       
+            // Guardar usuario en localStorage para usarlo en la otra página
+            localStorage.setItem("loggedInUser", data.user.usuario);
 
-                // Redirigir a la página principal
-                window.location.href = "Principal.html"; 
-            } else {
-                console.error("Error:", data.error);
-                alert("Credenciales incorrectas");
-            }
-        })
-        .catch(error => console.error("Error en la petición:", error));
-    });
+            // Redirigir a la página principal
+            window.location.href = "Principal.html"; 
+        } else {
+            console.error("Error:", data.error);
+            alert(" Credenciales incorrectas");
+        }
+    })
+    .catch(error => console.error("Error en la petición:", error));
 });
