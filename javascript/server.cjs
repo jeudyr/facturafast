@@ -17,7 +17,7 @@ app.use(cors()); // Para permitir solicitudes de dominios cruzados
 app.use(express.json()); // Para poder manejar datos JSON
 
 // Servir archivos estáticos desde la carpeta "html"
-app.use(express.static(path.join(__dirname, "../html")));
+app.use(express.static(path.resolve(__dirname, "../html")));
 
 // Ruta raíz (cuando entras al dominio)
 app.get("/", (req, res) => {
