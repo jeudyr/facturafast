@@ -44,7 +44,7 @@ pool.connect((err, client, release) => {
 });
 
 // Puerto dinámico para Render (o 3000 si estamos en local)
-const port = process.env.PORT || 1000;
+const port = process.env.PORT || 10000;
 
 app.listen(port, () => {
   console.log(`Servidor corriendo en el puerto ${port}`);
