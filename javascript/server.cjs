@@ -170,7 +170,7 @@ function enviarCorreoVerificacion(req, res) {
 app.post("/guardarProductos", (req, res) => {
   const { nombre, descripcion, cantidad, precio, usuario } = req.body;
   const query =
-    "INSERT INTO productos (nombre, descripcion, cantidad, precio, usuario) VALUES ($1, $2, $3, $4, $5)";
+    "INSERT INTO productos (nombre, descripcion, cantidad, precio, idusuario) VALUES ($1, $2, $3, $4, $5)";
   pool
     .query(query, [nombre, descripcion, cantidad, precio, usuario])
     .then(() => res.json({ message: "Producto guardado" }))
