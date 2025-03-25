@@ -4,6 +4,14 @@ const mysql = require('mysql2');
 const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
+
+// Servir archivos estáticos desde la carpeta "html"
+app.use(express.static(path.join(__dirname, "../html")));
+
+// Cuando el usuario entra a "/", enviar index.html
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../html/index.html"));
+});
 const PDFDocument = require("pdfkit");
 const brevo = require('@getbrevo/brevo');
 
