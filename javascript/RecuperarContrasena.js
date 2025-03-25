@@ -76,7 +76,7 @@ function guardarNuevaContrasena() {
         return;
     }
 
-    fetch("http://localhost:3000/actualizarContrasena", {
+    fetch("https://facturafast.onrender.com/actualizarContrasena", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -96,7 +96,7 @@ function guardarNuevaContrasena() {
 }
 
 function enviarCodigoPorCorreo(correo, codigo) {
-    fetch("http://localhost:3000/generarCorreo", {
+    fetch("https://facturafast.onrender.com/generarCorreo", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

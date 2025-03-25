@@ -10,6 +10,9 @@ const express = require("express");
 const { Pool } = require('pg'); // Usamos el paquete `pg` para PostgreSQL
 const cors = require("cors");
 const path = require("path");
+const nodemailer = require("nodemailer"); // To send emails
+const fs = require("fs");
+const PDFDocument = require("pdfkit");
 
 const app = express();
 
@@ -78,37 +81,36 @@ app.post("/login", (req, res) => {
 // REGISTRO
 app.post("/usuarios", (req, res) => {
   const { usuario, contrasena, nombre, apellidos, correo, celular } = req.body;
-  const query = "INSERT INTO usuarios (usuario, contrasena, nombre, apellidos, correo, celular) VALUES (?, ?, ?, ?, ?, ?)";
-  db.query(query, [usuario, contrasena, nombre, apellidos, correo, celular], (err, result) => {
-    if (err) return res.status(400).json({ error: "Usuario ya registrado" });
-    res.json({ message: "Usuario registrado exitosamente" });
-  });
+  const query =
+    "INSERT INTO usuarios (usuario, contrasena, nombre, apellidos, correo, celular) VALUES ($1, $2, $3, $4, $5, $6)";
+  pool
+    .query(query, [usuario, contrasena, nombre, apellidos, correo, celular])
+    .then(() => res.json({ message: "Usuario registrado exitosamente" }))
+    .catch((err) => res.status(400).json({ error: "Usuario ya registrado" }));
 });
 
-// VERIFICAR USUARIO Y CORREO
 app.post("/verificarUsuario", (req, res) => {
   const { usuario } = req.body;
-  db.query("SELECT * FROM usuarios WHERE usuario = ?", [usuario], (err, results) => {
-    if (err) return res.status(500).json({ error: "Error en la consulta" });
-    res.json({ valid: results.length === 0 });
-  });
+  pool
+    .query("SELECT * FROM usuarios WHERE usuario = $1", [usuario])
+    .then((results) => res.json({ valid: results.rows.length === 0 }))
+    .catch((err) => res.status(500).json({ error: "Error en la consulta" }));
 });
 
 app.post("/verificarCorreo", (req, res) => {
   const { correo } = req.body;
-  db.query("SELECT * FROM usuarios WHERE correo = ?", [correo], (err, results) => {
-    if (err) return res.status(500).json({ error: "Error en la consulta" });
-    res.json({ valid: results.length === 0 });
-  });
+  pool
+    .query("SELECT * FROM usuarios WHERE correo = $1", [correo])
+    .then((results) => res.json({ valid: results.rows.length === 0 }))
+    .catch((err) => res.status(500).json({ error: "Error en la consulta" }));
 });
 
-// ACTUALIZAR CONTRASEÑA
 app.post("/actualizarContrasena", (req, res) => {
   const { contrasena, correo } = req.body;
-  db.query("UPDATE usuarios SET contrasena = ? WHERE correo = ?", [contrasena, correo], (err, result) => {
-    if (err) return res.status(500).json({ error: "Error al actualizar" });
-    res.json({ success: true });
-  });
+  pool
+    .query("UPDATE usuarios SET contrasena = $1 WHERE correo = $2", [contrasena, correo])
+    .then(() => res.json({ success: true }))
+    .catch((err) => res.status(500).json({ error: "Error al actualizar" }));
 });
 
 // ENVIAR CORREO RECUPERACIÓN / VERIFICACIÓN
@@ -125,106 +127,104 @@ function enviarCorreo(req, res) {
         <p>Tu código es: <strong style="font-size: 20px;">${codigo}</strong></p>
       </div>`,
     sender: { name: "FacturaFast", email: "facturafastcr@gmail.com" },
-    to: [{ email: correo }]
+    to: [{ email: correo }],
   };
 
   apiInstance.sendTransacEmail(sendSmtpEmail)
-    .then(data => res.json({ message: "Correo enviado" }))
-    .catch(error => {
-      console.error("Error al enviar correo:", error);
-      res.status(500).json({ error: "No se pudo enviar el correo" });
-    });
+    .then(() => res.json({ message: "Correo enviado" }))
+    .catch((error) => res.status(500).json({ error: "No se pudo enviar el correo" }));
 }
 
 function enviarCorreoVerificacion(req, res) {
-    const { correo, codigo } = req.body;
-    const sendSmtpEmail = {
-      subject: "Verificacion de cuenta",
-      htmlContent: `
-        <div style="font-family: Arial; text-align: center;">
-          <h2>Verificacion de cuenta</h2>
-          <p>Tu código es: <strong style="font-size: 20px;">${codigo}</strong></p>
-        </div>`,
-      sender: { name: "FacturaFast", email: "facturafastcr@gmail.com" },
-      to: [{ email: correo }]
-    };
-  
-    apiInstance.sendTransacEmail(sendSmtpEmail)
-      .then(data => res.json({ message: "Correo enviado" }))
-      .catch(error => {
-        console.error("Error al enviar correo:", error);
-        res.status(500).json({ error: "No se pudo enviar el correo" });
-      });
-  }
+  const { correo, codigo } = req.body;
+  const sendSmtpEmail = {
+    subject: "Verificación de cuenta",
+    htmlContent: `
+      <div style="font-family: Arial; text-align: center;">
+        <h2>Verificación de cuenta</h2>
+        <p>Tu código es: <strong style="font-size: 20px;">${codigo}</strong></p>
+      </div>`,
+    sender: { name: "FacturaFast", email: "facturafastcr@gmail.com" },
+    to: [{ email: correo }],
+  };
+
+  apiInstance.sendTransacEmail(sendSmtpEmail)
+    .then(() => res.json({ message: "Correo enviado" }))
+    .catch((error) => res.status(500).json({ error: "No se pudo enviar el correo" }));
+}
 
 // PRODUCTOS
 app.post("/guardarProductos", (req, res) => {
   const { nombre, descripcion, cantidad, precio, usuario } = req.body;
-  const query = "INSERT INTO productos (nombre, descripcion, cantidad, precio, usuario) VALUES (?, ?, ?, ?, ?)";
-  db.query(query, [nombre, descripcion, cantidad, precio, usuario], (err, result) => {
-    if (err) return res.status(500).json({ error: "Error al guardar producto" });
-    res.json({ message: "Producto guardado" });
-  });
+  const query =
+    "INSERT INTO productos (nombre, descripcion, cantidad, precio, usuario) VALUES ($1, $2, $3, $4, $5)";
+  pool
+    .query(query, [nombre, descripcion, cantidad, precio, usuario])
+    .then(() => res.json({ message: "Producto guardado" }))
+    .catch((err) => res.status(500).json({ error: "Error al guardar producto" }));
 });
 
 app.post("/editar", (req, res) => {
   const { nombre, descripcion, cantidad, precio, idTemp } = req.body;
-  db.query("UPDATE productos SET nombre=?, descripcion=?, cantidad=?, precio=? WHERE idProducto=?", 
-  [nombre, descripcion, cantidad, precio, idTemp], (err) => {
-    if (err) return res.status(500).json({ error: "Error al editar producto" });
-    res.json({ message: "Producto editado" });
-  });
+  const query =
+    "UPDATE productos SET nombre = $1, descripcion = $2, cantidad = $3, precio = $4 WHERE idProducto = $5";
+  pool
+    .query(query, [nombre, descripcion, cantidad, precio, idTemp])
+    .then(() => res.json({ message: "Producto editado" }))
+    .catch((err) => res.status(500).json({ error: "Error al editar producto" }));
 });
 
 app.post("/productos", (req, res) => {
   const { usuario } = req.body;
-  db.query("SELECT * FROM productos WHERE usuario = ?", [usuario], (err, results) => {
-    if (err) return res.status(500).json({ error: "Error" });
-    res.json(results);
-  });
+  pool
+    .query("SELECT * FROM productos WHERE usuario = $1", [usuario])
+    .then((results) => res.json(results.rows))
+    .catch((err) => res.status(500).json({ error: "Error al obtener productos" }));
 });
 
 app.post("/editarMostrar", (req, res) => {
   const { idProducto } = req.body;
-  db.query("SELECT * FROM productos WHERE idProducto = ?", [idProducto], (err, results) => {
-    if (err) return res.status(500).json({ error: "Error" });
-    res.json({ producto: results[0] });
-  });
+  pool
+    .query("SELECT * FROM productos WHERE idProducto = $1", [idProducto])
+    .then((results) => res.json({ producto: results.rows[0] }))
+    .catch((err) => res.status(500).json({ error: "Error al obtener el producto" }));
 });
 
-app.post("/elimarProducto", (req, res) => {
+app.post("/eliminarProducto", (req, res) => {
   const { idProducto } = req.body;
-  db.query("DELETE FROM productos WHERE idProducto = ?", [idProducto], (err) => {
-    if (err) return res.status(500).json({ error: "Error al eliminar" });
-    res.json({ message: "Producto eliminado" });
-  });
+  pool
+    .query("DELETE FROM productos WHERE idProducto = $1", [idProducto])
+    .then(() => res.json({ message: "Producto eliminado" }))
+    .catch((err) => res.status(500).json({ error: "Error al eliminar el producto" }));
 });
 
 // FACTURACIÓN
 app.post("/generarFactura", (req, res) => {
   const { fecha, montoTotal } = req.body;
-  db.query("INSERT INTO facturas (fecha, montoTotal) VALUES (?, ?)", [fecha, montoTotal], (err) => {
-    if (err) return res.status(500).json({ error: "Error al crear factura" });
-    res.json({ message: "Factura creada" });
-  });
+  pool
+    .query("INSERT INTO facturas (fecha, montoTotal) VALUES ($1, $2)", [fecha, montoTotal])
+    .then(() => res.json({ message: "Factura creada" }))
+    .catch((err) => res.status(500).json({ error: "Error al crear factura" }));
 });
 
 app.post("/obtenerUltimo", (req, res) => {
-  db.query("SELECT idFactura FROM facturas ORDER BY idFactura DESC LIMIT 1", (err, results) => {
-    if (err) return res.status(500).json({ error: "Error" });
-    res.json(results);
-  });
+  pool
+    .query("SELECT idFactura FROM facturas ORDER BY idFactura DESC LIMIT 1")
+    .then((results) => res.json(results.rows))
+    .catch((err) => res.status(500).json({ error: "Error al obtener última factura" }));
 });
 
 app.post("/generarFacturaDetallada", (req, res) => {
   const { idProducto, monto, cantidad, fkFactura, fkUsuario } = req.body;
-  const query = "INSERT INTO facturasdetalladas (idProducto, monto, cantidad, fkFactura, fkUsuario) VALUES (?, ?, ?, ?, ?)";
-  db.query(query, [idProducto, monto, cantidad, fkFactura, fkUsuario], (err) => {
-    if (err) return res.status(500).json({ error: "Error al guardar detalle" });
-    res.json({ message: "Detalle agregado" });
-  });
+  const query =
+    "INSERT INTO facturasdetalladas (idProducto, monto, cantidad, fkFactura, fkUsuario) VALUES ($1, $2, $3, $4, $5)";
+  pool
+    .query(query, [idProducto, monto, cantidad, fkFactura, fkUsuario])
+    .then(() => res.json({ message: "Detalle agregado" }))
+    .catch((err) => res.status(500).json({ error: "Error al agregar detalle" }));
 });
 
+// PDF Generación
 app.post("/generarPDF", (req, res) => {
   const { idFactura, fecha, montoTotal, productos } = req.body;
 
@@ -251,10 +251,10 @@ app.post("/generarPDF", (req, res) => {
 
 // STATS
 app.get("/obtenerFacturas", (_, res) => {
-  db.query("SELECT * FROM facturas", (err, results) => {
-    if (err) return res.status(500).json({ error: "Error" });
-    res.json(results);
-  });
+  pool
+    .query("SELECT * FROM facturas")
+    .then((results) => res.json(results.rows))
+    .catch((err) => res.status(500).json({ error: "Error" }));
 });
 
 app.get("/mayorProductoVendido", (_, res) => {
@@ -264,32 +264,32 @@ app.get("/mayorProductoVendido", (_, res) => {
     JOIN productos p ON fd.idProducto = p.idProducto
     GROUP BY fd.idProducto
     ORDER BY totalVendido DESC LIMIT 5`;
-  db.query(query, (err, results) => {
-    if (err) return res.status(500).json({ error: "Error" });
-    res.json(results);
-  });
+  pool
+    .query(query)
+    .then((results) => res.json(results.rows))
+    .catch((err) => res.status(500).json({ error: "Error" }));
 });
 
 app.get("/ventasMensuales", (_, res) => {
   const query = `
-    SELECT DATE_FORMAT(fecha, '%Y-%m') AS fecha, SUM(montoTotal) AS total
+    SELECT TO_CHAR(fecha, 'YYYY-MM') AS fecha, SUM(montoTotal) AS total
     FROM facturas
     GROUP BY fecha`;
-  db.query(query, (err, results) => {
-    if (err) return res.status(500).json({ error: "Error" });
-    res.json(results);
-  });
+  pool
+    .query(query)
+    .then((results) => res.json(results.rows))
+    .catch((err) => res.status(500).json({ error: "Error" }));
 });
 
 app.get("/ventasSemanales", (_, res) => {
   const query = `
     SELECT SUM(montoTotal) AS total
     FROM facturas
-    WHERE fecha >= CURDATE() - INTERVAL 7 DAY`;
-  db.query(query, (err, results) => {
-    if (err) return res.status(500).json({ error: "Error" });
-    res.json(results);
-  });
+    WHERE fecha >= CURRENT_DATE - INTERVAL '7 days'`;
+  pool
+    .query(query)
+    .then((results) => res.json(results.rows))
+    .catch((err) => res.status(500).json({ error: "Error" }));
 });
 
 

@@ -29,7 +29,7 @@ function generarCorreos() {
 
 
 function enviarCodigoPorCorreo(correo, codigo) {
-    fetch("http://localhost:3000/generarCorreoVerificacion", {
+    fetch("https://facturafast.onrender.com/generarCorreoVerificacion", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -144,7 +144,7 @@ async function validarExistencia() {
 async function validarCorreo() {
     try {
         console.log(correo);
-        const response = await fetch("http://localhost:3000/verificarCorreo", {
+        const response = await fetch("https://facturafast.onrender.com/verificarCorreo", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -171,7 +171,7 @@ async function validarCorreo() {
 async function validarUsuario() {
     console.log(usuario);
     try {
-        const response = await fetch("http://localhost:3000/verificarUsuario", {
+        const response = await fetch("https://facturafast.onrender.com/verificarUsuario", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

@@ -45,7 +45,7 @@ function changeUserRole() {
     }
 
     // Validar la contraseña con el servidor
-    fetch("http://localhost:3000/verify-password", {
+    fetch("https://facturafast.onrender.com/verify-password", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -125,7 +125,7 @@ document.getElementById('productForm').addEventListener('submit', function(event
         return;
     }
     if(idTemp==-1){
-        fetch("http://localhost:3000/guardarProductos", {
+        fetch("https://facturafast.onrender.com/guardarProductos", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -143,7 +143,7 @@ document.getElementById('productForm').addEventListener('submit', function(event
             alert("Error al agregar el producto");
         });
     }else{
-        fetch("http://localhost:3000/editar", {
+        fetch("https://facturafast.onrender.com/editar", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ nombre, descripcion, cantidad, precio, idTemp }) 
@@ -173,7 +173,7 @@ function updateProductList() {
     productSelect.innerHTML = ""; // Limpiar el select antes de agregar nuevas opciones
     productos = [];
     let usuario = localStorage.getItem("loggedInUser");
-    fetch("http://localhost:3000/productos", {
+    fetch("https://facturafast.onrender.com/productos", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -210,7 +210,7 @@ function updateProductList() {
 }
 
 function eliminarProducto(idProducto) {
-    fetch("http://localhost:3000/elimarProducto", {
+    fetch("https://facturafast.onrender.com/elimarProducto", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -235,7 +235,7 @@ function eliminarProducto(idProducto) {
 
 
 function editProduct(idProducto) {
-    fetch("http://localhost:3000/editarMostrar", {
+    fetch("https://facturafast.onrender.com/editarMostrar", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -404,7 +404,7 @@ async function generarFactura() {
     console.log("📅 Fecha formateada:", fecha); // Verificación en consola
 
     // **1️⃣ Insertar la factura principal**
-    let facturaResponse = await fetch("http://localhost:3000/generarFactura", {
+    let facturaResponse = await fetch("https://facturafast.onrender.com/generarFactura", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fecha, montoTotal }) 
@@ -418,7 +418,7 @@ async function generarFactura() {
 
     // **2️⃣ Obtener el último ID de factura generado**
     let fkFactura = -1;
-    let obtenerUltimaFactura = await fetch("http://localhost:3000/obtenerUltimo", {
+    let obtenerUltimaFactura = await fetch("https://facturafast.onrender.com/obtenerUltimo", {
         method: "POST",
         headers: { "Content-Type": "application/json" }
     });
@@ -442,7 +442,7 @@ async function generarFactura() {
         let nuevaCantidadDisponible = Math.round(ProductoSeleccionado.cantidad - cantidad);
         
         // **4️⃣ Actualizar la cantidad en el inventario**
-        await fetch("http://localhost:3000/editar", {
+        await fetch("https://facturafast.onrender.com/editar", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
@@ -458,7 +458,7 @@ async function generarFactura() {
         let fkUsuario = localStorage.getItem("loggedInUser");
 
         // **5️⃣ Insertar el detalle de la factura**
-        await fetch("http://localhost:3000/generarFacturaDetallada", {
+        await fetch("https://facturafast.onrender.com/generarFacturaDetallada", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ idProducto, monto , cantidad, fkFactura, fkUsuario}) 
@@ -473,7 +473,7 @@ async function generarFactura() {
     }
 
     // **6️⃣ Generar y descargar el PDF**
-    let pdfResponse = await fetch("http://localhost:3000/generarPDF", {
+    let pdfResponse = await fetch("https://facturafast.onrender.com/generarPDF", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idFactura: fkFactura, fecha, montoTotal, productos: productosFactura })
@@ -515,7 +515,7 @@ function cargarFacturas() {
         endpoint = "/ventasSemanales";
     }
 
-    fetch(`http://localhost:3000${endpoint}`)
+    fetch(`https://facturafast.onrender.com${endpoint}`)
         .then(response => response.json())
         .then(data => {
             let invoiceRecords = document.getElementById("invoiceRecords");
