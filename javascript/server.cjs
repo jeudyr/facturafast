@@ -10,9 +10,16 @@ const express = require("express");
 const { Pool } = require('pg'); // Usamos el paquete `pg` para PostgreSQL
 const cors = require("cors");
 const path = require("path");
-const nodemailer = require("nodemailer"); // To send emails
 const fs = require("fs");
 const PDFDocument = require("pdfkit");
+
+const SibApiV3Sdk = require("sib-api-v3-sdk");
+
+// Configura la API de Brevo (SendinBlue)
+const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+const apiKey = process.env.BREVO_API_KEY;
+
+SibApiV3Sdk.ApiClient.instance.authentications['api-key'].apiKey = apiKey;
 
 const app = express();
 
@@ -132,7 +139,10 @@ function enviarCorreo(req, res) {
 
   apiInstance.sendTransacEmail(sendSmtpEmail)
     .then(() => res.json({ message: "Correo enviado" }))
-    .catch((error) => res.status(500).json({ error: "No se pudo enviar el correo" }));
+    .catch((error) => {
+      console.error("Error al enviar correo:", error);
+      res.status(500).json({ error: "No se pudo enviar el correo" });
+    });
 }
 
 function enviarCorreoVerificacion(req, res) {
@@ -150,7 +160,10 @@ function enviarCorreoVerificacion(req, res) {
 
   apiInstance.sendTransacEmail(sendSmtpEmail)
     .then(() => res.json({ message: "Correo enviado" }))
-    .catch((error) => res.status(500).json({ error: "No se pudo enviar el correo" }));
+    .catch((error) => {
+      console.error("Error al enviar correo:", error);
+      res.status(500).json({ error: "No se pudo enviar el correo" });
+    });
 }
 
 // PRODUCTOS
