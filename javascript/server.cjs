@@ -51,14 +51,18 @@ app.listen(port, () => {
 });
 
 
-// LOGIN
 app.post("/login", (req, res) => {
   const { usuario, contrasena } = req.body;
-  const query = "SELECT * FROM usuarios WHERE usuario = ? AND contrasena = ?";
-  db.query(query, [usuario, contrasena], (err, results) => {
+
+  // Usamos una consulta SQL con PostgreSQL (pg)
+  const query = "SELECT * FROM usuarios WHERE usuario = $1 AND contrasena = $2";
+
+  // Ejecutamos la consulta
+  pool.query(query, [usuario, contrasena], (err, results) => {
     if (err) return res.status(500).json({ error: "Error en la consulta" });
-    if (results.length > 0) {
-      res.json({ message: "Login exitoso", user: results[0] });
+
+    if (results.rows.length > 0) {
+      res.json({ message: "Login exitoso", user: results.rows[0] });
     } else {
       res.status(401).json({ error: "Credenciales inválidas" });
     }
