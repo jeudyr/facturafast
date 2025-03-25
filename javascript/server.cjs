@@ -20,10 +20,10 @@ app.use(express.json()); // Para poder manejar datos JSON
 // Servir archivos estáticos desde la carpeta "html"
 app.use(express.static(path.resolve(__dirname, "../html")));
 // Servir archivos estáticos desde las carpetas css y javascript
-app.use('/css', express.static(path.join(__dirname, '/css')));
+app.use('/css', express.static(path.join(__dirname, '../css')));
 
 // Servir archivos estáticos desde la carpeta 'javascript'
-app.use('/javascript', express.static(path.join(__dirname, '/javascript')));
+app.use('/javascript', express.static(path.join(__dirname, '../javascript')));
 
 // Ruta raíz (cuando entras al dominio)
 app.get("/", (req, res) => {
