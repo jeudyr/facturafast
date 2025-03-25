@@ -19,6 +19,7 @@ app.use(express.json()); // Para poder manejar datos JSON
 
 app.use("/css", express.static(path.join(__dirname, "../css"))); // ruta para archivos CSS
 app.use("/javascript", express.static(path.join(__dirname, "../javascript"))); // ruta para archivos JS
+app.use(express.static(path.join(__dirname, 'public')));
 // Ruta raíz (cuando entras al dominio)
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../html/index.html"));

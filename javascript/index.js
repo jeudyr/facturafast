@@ -23,7 +23,7 @@ document.getElementById('login').addEventListener('submit', function(event) {
             localStorage.setItem("loggedInUser", data.user.usuario);
 
             // Redirigir a la página principal
-            window.location.href = "Principal.html"; 
+            window.location.href = "/Principal.html"; 
         } else {
             console.error("Error:", data.error);
             alert(" Credenciales incorrectas");
