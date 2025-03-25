@@ -30,7 +30,7 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   ssl: {
-    rejectUnauthorized: false // Para conexiones externas como Render
+    rejectUnauthorized: false // Esto permite la conexión SSL
   }
 });
 
