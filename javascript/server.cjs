@@ -189,10 +189,12 @@ app.post("/editar", (req, res) => {
 
 app.post("/productos", (req, res) => {
   const { usuario } = req.body;
+  
+  // Cambiar 'usuario' por 'idusuario' si la columna correcta es idusuario
   pool
-    .query("SELECT * FROM productos WHERE usuario = $1", [usuario])
+    .query("SELECT * FROM productos WHERE idusuario = $1", [usuario])
     .then((results) => {
-      console.log("Productos obtenidos:", results.rows);  // Agregar para depuración
+      console.log("Productos obtenidos:", results.rows);  // Para depuración
       res.json(results.rows);
     })
     .catch((err) => res.status(500).json({ error: "Error al obtener productos", details: err }));
