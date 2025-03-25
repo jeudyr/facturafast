@@ -1,4 +1,10 @@
 require('dotenv').config();
+
+// Verificar que las variables están cargadas correctamente
+console.log("DB Host:", process.env.DB_HOST);
+console.log("DB User:", process.env.DB_USER);
+console.log("DB Password:", process.env.DB_PASSWORD);
+console.log("DB Name:", process.env.DB_NAME);
 const express = require("express");
 const mysql = require('mysql2');
 const cors = require("cors");
