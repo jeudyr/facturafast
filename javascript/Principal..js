@@ -192,17 +192,17 @@ function updateProductList() {
                 Cantidad: ${product.cantidad} | 
                 Precio: $${parseFloat(product.precio).toFixed(2)}
                 <span class="button-container">
-                <button class="edit-button btn btn-edit" onclick="editProduct(${product.idProducto})">
+                <button class="edit-button btn btn-edit" onclick="editProduct(${product.idproducto})">
                     📝
                 </button>
-                <button class="delete-button btn btn-delete" onclick="eliminarProducto(${product.idProducto})">
+                <button class="delete-button btn btn-delete" onclick="eliminarProducto(${product.idproducto})">
                     🗑️
                 </button>
             </span>
             `;
             productosLista.appendChild(li);
             let option = document.createElement('option');
-            option.value = product.idProducto; 
+            option.value = product.idproducto; 
             option.textContent = `${product.nombre}`;
             productSelect.appendChild(option);
         });
