@@ -2,16 +2,16 @@
 document.getElementById('formularioRecuperacion').addEventListener('submit', generarCorreos);
 let correos = [];
 let correo="";
+let numeroAleatorio="";
 
 function generarCorreos(event) {
     event.preventDefault(); 
     correo = document.getElementById("correo").value.trim();
-    let numeroAleatorio = Math.floor(10000 + Math.random() * 90000);
+    numeroAleatorio = Math.floor(10000 + Math.random() * 90000);
     if (!correo) {
         alert("⚠️ Por favor ingresa un correo válido");
         return;
     }
-    correos.push({ correo, codigo: numeroAleatorio });
     enviarCodigoPorCorreo(correo, numeroAleatorio);
     agregarCampoVerificacion();
 }
@@ -39,9 +39,7 @@ function agregarCampoVerificacion() {
 
 function verificarCodigo() {
     let codigoIngresado = document.getElementById("codigoIngresado").value.trim();
-    let usuario = correos.find(user => user.correo === correo);
-
-    if (usuario && usuario.codigo == codigoIngresado) {
+    if (numeroAleatorio == codigoIngresado) {
         mostrarCampoNuevaContrasena();
     } else {
         alert("Código incorrecto. Intenta de nuevo.");
@@ -70,8 +68,6 @@ function mostrarCampoNuevaContrasena() {
 
 function guardarNuevaContrasena() {
     let contrasena = document.getElementById("nuevaContrasena").value.trim();
-    let correo = document.getElementById("correo").value.trim();
-    console.log(correo);
     if (!contrasena) {
         alert("⚠️ Por favor ingresa una nueva contraseña.");
         return;
