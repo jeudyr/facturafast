@@ -211,7 +211,7 @@ function updateProductList() {
 }
 
 function eliminarProducto(idProducto) {
-    fetch("https://facturafast.onrender.com/elimarProducto", {
+    fetch("https://facturafast.onrender.com/eliminarProducto", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
