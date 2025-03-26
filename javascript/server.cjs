@@ -371,7 +371,6 @@ app.post("/mayorProductoVendido", (req, res) => {
 
   pool.query(query, [usuario])
     .then(results => {
-      console.log("Resultados de la consulta mayorProductoVendido:", results.rows);
       res.json(results.rows);
     })
     .catch(err => {
