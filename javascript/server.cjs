@@ -386,7 +386,10 @@ app.post("/ventasMensuales", (req, res) => {
   const query = `
     SELECT TO_CHAR(f.fecha, 'YYYY-MM') AS fecha, SUM(fd.monto) AS total
     FROM facturasdetalladas fd
+    JOIN facturas f ON f.idfactura = fd.fkfactura
     WHERE fd.fkusuario = $1
+      AND EXTRACT(MONTH FROM f.fecha) = EXTRACT(MONTH FROM CURRENT_DATE)  -- Validar que la factura esté en el mes actual
+      AND EXTRACT(YEAR FROM f.fecha) = EXTRACT(YEAR FROM CURRENT_DATE)  -- Validar que la factura esté en el año actual
     GROUP BY TO_CHAR(f.fecha, 'YYYY-MM')
     ORDER BY fecha DESC;
   `;
@@ -405,14 +408,17 @@ app.post("/ventasSemanales", (req, res) => {
   const query = `
     SELECT SUM(fd.monto) AS total
     FROM facturasdetalladas fd
-    WHERE fd.fkusuario = $1 
-      AND fd.fecha >= CURRENT_DATE - INTERVAL '7 days';
+    JOIN facturas f ON f.idfactura = fd.fkfactura
+    WHERE fd.fkusuario = $1
+      AND EXTRACT(MONTH FROM f.fecha) = EXTRACT(MONTH FROM CURRENT_DATE)  -- Validar que la factura sea del mes actual
+      AND EXTRACT(YEAR FROM f.fecha) = EXTRACT(YEAR FROM CURRENT_DATE)  -- Validar que la factura sea del año actual
+      AND f.fecha >= CURRENT_DATE - INTERVAL '7 days';  -- Filtrar por las últimas 7 días
   `;
 
   pool.query(query, [usuario])
     .then((results) => {
       const total = results.rows.length > 0 ? parseFloat(results.rows[0].total) : 0;
-      res.json([{ total: total.toFixed(2) }]); // Devolvemos un único objeto con el total calculado
+      res.json([{ total: total.toFixed(2) }]);  // Devolver un único objeto con el total calculado
     })
     .catch((err) => res.status(500).json({ error: "Error al obtener las ventas semanales", details: err }));
 });
