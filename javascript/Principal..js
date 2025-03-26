@@ -306,8 +306,11 @@ function agregarFactura(event) {
         // Actualizar el HTML de la lista
         let item = listaFacturacion.querySelector(`li[data-id="${id}"]`);
         if (item) {
+            // Asegurarse de que la clase .cantidad esté presente
             let cantidadActualizada = item.querySelector(".cantidad");
-            cantidadActualizada.textContent = `Cantidad: ${productoEnLista.cantidad}`;
+            if (cantidadActualizada) {
+                cantidadActualizada.textContent = `Cantidad: ${productoEnLista.cantidad}`;
+            }
         }
 
     } else {
@@ -316,7 +319,7 @@ function agregarFactura(event) {
         li.setAttribute('data-id', ProductoSeleccionado.idproducto); // Para identificarlo en el futuro
         li.innerHTML = `
             ${ProductoSeleccionado.nombre} - ${ProductoSeleccionado.descripcion} | 
-            Cantidad: ${cantidad} | Precio: $${(ProductoSeleccionado.precio * cantidad).toFixed(2)}
+            Cantidad: <span class="cantidad">${cantidad}</span> | Precio: $${(ProductoSeleccionado.precio * cantidad).toFixed(2)}
             <span class="button-container">
                 <button class="edit-button btn btn-edit" onclick="editProductFacturacion(${ProductoSeleccionado.idproducto})">
                     📝
