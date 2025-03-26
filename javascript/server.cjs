@@ -228,8 +228,14 @@ app.post("/generarFactura", (req, res) => {
 app.post("/obtenerUltimo", (req, res) => {
   pool
     .query("SELECT idfactura FROM facturas ORDER BY idfactura DESC LIMIT 1")
-    .then((results) => res.json(results.rows))
-    .catch((err) => res.status(500).json({ error: "Error al obtener última factura" }));
+    .then((results) => {
+      if (results.rows.length > 0) {
+        res.json(results.rows);
+      } else {
+        res.status(404).json({ error: "No se encontraron facturas" });
+      }
+    })
+    .catch((err) => res.status(500).json({ error: "Error al obtener última factura", details: err.message }));
 });
 
 app.post("/generarFacturaDetallada", (req, res) => {
