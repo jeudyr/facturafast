@@ -45,8 +45,8 @@ app.get('/index.html', (req, res) => {
   res.sendFile(path.join(__dirname, "../html/index.html"));
 });
 
-app.get('/RecuperarContrasena.html', (req, res) => {
-  res.sendFile(path.join(__dirname, "../html/RecuperarContrasena.html"));
+app.get('/Recuperar_Contrasena.html', (req, res) => {
+  res.sendFile(path.join(__dirname, "../html/Recuperar_Contrasena.html"));
 });
 
 // Conexión a la base de datos PostgreSQL
