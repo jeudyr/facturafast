@@ -345,7 +345,8 @@ app.post("/obtenerFacturas", (req, res) => {
     SELECT f.idfactura, f.fecha, f.montototal
     FROM facturas f
     JOIN facturasdetalladas fd ON f.idfactura = fd.fkfactura
-    WHERE fd.fkusuario = $1;
+    WHERE fd.fkusuario = $1
+    GROUP BY f.idfactura, f.fecha, f.montototal;
   `;
 
   pool.query(query, [usuario])
@@ -366,7 +367,8 @@ app.post("/mayorProductoVendido", (req, res) => {
     WHERE fd.fkusuario = $1
     GROUP BY p.nombre
     ORDER BY totalvendido DESC
-    LIMIT 1`;
+    LIMIT 1;
+  `;
 
   pool.query(query, [usuario])
     .then(results => {
@@ -383,12 +385,13 @@ app.post("/ventasMensuales", (req, res) => {
   const { usuario } = req.body;  // Obtener el usuario del cuerpo de la solicitud
 
   const query = `
-    SELECT TO_CHAR(fecha, 'YYYY-MM') AS fecha, SUM(montototal) AS total
-    FROM facturas
-    JOIN facturasdetalladas fd ON facturas.idfactura = fd.fkfactura
+    SELECT TO_CHAR(f.fecha, 'YYYY-MM') AS fecha, SUM(f.montototal) AS total
+    FROM facturas f
+    JOIN facturasdetalladas fd ON f.idfactura = fd.fkfactura
     WHERE fd.fkusuario = $1
-    GROUP BY TO_CHAR(fecha, 'YYYY-MM')
-    ORDER BY fecha DESC`;
+    GROUP BY TO_CHAR(f.fecha, 'YYYY-MM')
+    ORDER BY fecha DESC;
+  `;
 
   pool.query(query, [usuario])
     .then((results) => res.json(results.rows))
@@ -402,13 +405,19 @@ app.post("/ventasSemanales", (req, res) => {
   const { usuario } = req.body;  // Obtener el usuario del cuerpo de la solicitud
 
   const query = `
-    SELECT SUM(montototal) AS total
-    FROM facturas
-    JOIN facturasdetalladas fd ON facturas.idfactura = fd.fkfactura
-    WHERE fd.fkusuario = $1 AND fecha >= CURRENT_DATE - INTERVAL '7 days'`;
+    SELECT SUM(f.montototal) AS total
+    FROM facturas f
+    JOIN facturasdetalladas fd ON f.idfactura = fd.fkfactura
+    WHERE fd.fkusuario = $1 
+      AND f.fecha >= CURRENT_DATE - INTERVAL '7 days'
+    GROUP BY f.idfactura;
+  `;
 
   pool.query(query, [usuario])
-    .then((results) => res.json(results.rows))
+    .then((results) => {
+      const total = results.rows.reduce((sum, row) => sum + parseFloat(row.total), 0); // Aseguramos que sumemos correctamente
+      res.json([{ total }]); // Devolvemos un único objeto con el total calculado
+    })
     .catch((err) => res.status(500).json({ error: "Error al obtener las ventas semanales", details: err }));
 });
 
