@@ -287,32 +287,46 @@ function agregarFactura(event) {
         return;
     }
 
-    if(ProductoSeleccionado.cantidad<cantidad){
+    if(ProductoSeleccionado.cantidad < cantidad){
         alert("Cantidad sobrepasada del inventario.");
         return;
     }
 
-    let li = document.createElement('li');
-    li.innerHTML = `
-        ${ProductoSeleccionado.nombre} - ${ProductoSeleccionado.descripcion} | Cantidad: ${cantidad} | Precio: $${(ProductoSeleccionado.precio * cantidad).toFixed(2)}
-        <span class="button-container">
-            <button class="edit-button btn btn-edit" onclick="editProductFacturacion(${ProductoSeleccionado.idproducto})">
-                📝
-            </button>
-            <button class="delete-button btn btn-delete" onclick="eliminarProductoFacturacion(${ProductoSeleccionado.idproducto})">
-                🗑️
-            </button>
-        </span>
-    `;
-    listaFacturacion.appendChild(li);
-    
-    listaFacturacion.appendChild(li);
+    // Verificar si el producto ya está en la lista de productos facturados
+    let productoEnLista = productosFacturar.find(p => p.idproducto == id);
 
-    productosFacturar.push({ ...ProductoSeleccionado, cantidad });
+    if (productoEnLista) {
+        // Si el producto ya existe, actualizar la cantidad
+        productoEnLista.cantidad += cantidad;
 
-    let total = (totalAmount+(ProductoSeleccionado.precio*cantidad));
-    console.log(total);
-    totalAmountElement.textContent = total.toFixed(2);
+        // Actualizar el total
+        totalAmount += ProductoSeleccionado.precio * cantidad;
+        totalAmountElement.textContent = totalAmount.toFixed(2);
+
+        // Actualizar el HTML de la lista
+        let item = listaFacturacion.querySelector(`li[data-id="${id}"]`);
+        let cantidadActualizada = item.querySelector(".cantidad");
+        cantidadActualizada.textContent = `Cantidad: ${productoEnLista.cantidad}`;
+
+    } else {
+        // Si el producto no está en la lista, agregarlo
+        let li = document.createElement('li');
+        li.setAttribute('data-id', ProductoSeleccionado.idproducto); // Para identificarlo en el futuro
+        li.innerHTML = `
+            ${ProductoSeleccionado.nombre} - ${ProductoSeleccionado.descripcion} | Cantidad: ${cantidad} | Precio: $${(ProductoSeleccionado.precio * cantidad).toFixed(2)}
+            <span class="button-container">
+                <button class="edit-button btn btn-edit" onclick="editProductFacturacion(${ProductoSeleccionado.idproducto})">
+                    📝
+                </button>
+                <button class="delete-button btn btn-delete" onclick="eliminarProductoFacturacion(${ProductoSeleccionado.idproducto})">
+                    🗑️
+                </button>
+            </span>
+        `;
+        listaFacturacion.appendChild(li);
+
+        productosFacturar.push({ ...ProductoSeleccionado, cantidad });
+    }
 
     // Limpiar la cantidad ingresada después de agregar
     document.getElementById('cantidadFacturacion').value = "";
