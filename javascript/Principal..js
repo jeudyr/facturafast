@@ -488,6 +488,7 @@ async function generarFactura() {
         listaFacturacion.innerHTML = "";
         let totalAmount = 0;
         totalAmountElement.textContent = totalAmount.toFixed(2);
+        updateProductList();
 
         alert("Factura generada correctamente.");
     } catch (error) {
