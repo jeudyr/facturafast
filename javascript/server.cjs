@@ -416,11 +416,11 @@ app.post("/ventasSemanales", (req, res) => {
   `;
 
   pool.query(query, [usuario])
-    .then((results) => {
-      const total = results.rows.length > 0 ? parseFloat(results.rows[0].total) : 0;
-      res.json([{ total: total.toFixed(2) }]);  // Devolver un único objeto con el total calculado
-    })
-    .catch((err) => res.status(500).json({ error: "Error al obtener las ventas semanales", details: err }));
+    .then((results) => res.json(results.rows))
+    .catch((err) => {
+      console.error("Error al obtener las ventas mensuales", err);
+      res.status(500).json({ error: "Error al obtener las ventas semanales", details: err });
+    });
 });
 
 
