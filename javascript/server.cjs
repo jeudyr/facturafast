@@ -219,10 +219,24 @@ app.post("/eliminarProducto", (req, res) => {
 // FACTURACIÓN
 app.post("/generarFactura", (req, res) => {
   const { fecha, montoTotal } = req.body;
+
+  // Insertamos la factura y obtenemos el idfactura generado automáticamente
+  const query = `
+    INSERT INTO facturas (fecha, montototal)
+    VALUES ($1, $2)
+    RETURNING idfactura;`;
+
   pool
-    .query("INSERT INTO facturas (fecha, montototal) VALUES ($1, $2)", [fecha, montoTotal])
-    .then(() => res.json({ message: "Factura creada" }))
-    .catch((err) => res.status(500).json({ error: "Error al crear factura" }));
+    .query(query, [fecha, montoTotal])
+    .then((results) => {
+      // Si la inserción es exitosa, obtenemos el idfactura generado
+      const idFactura = results.rows[0].idfactura;
+      res.json({ message: "Factura generada correctamente", idFactura });
+    })
+    .catch((err) => {
+      console.error("Error al generar la factura:", err);
+      res.status(500).json({ error: "Error al generar la factura" });
+    });
 });
 
 app.post("/obtenerUltimo", (req, res) => {
