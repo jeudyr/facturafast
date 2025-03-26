@@ -520,11 +520,16 @@ function cargarFacturas() {
 
         // Dependiendo del filtro, mostrar los datos
         if (filtro === "todas") {
-            data.forEach(factura => {
-                let li = document.createElement("li");
-                li.textContent = `Factura #${factura.idfactura} - Total: $${factura.montototal} - Fecha: ${factura.fecha}`;
-                invoiceRecords.appendChild(li);
-            });
+            // Verifica si hay datos y recorre las facturas
+            if (data.length > 0) {
+                data.forEach(factura => {
+                    let li = document.createElement("li");
+                    li.textContent = `Factura #${factura.idfactura} - Total: $${factura.montototal} - Fecha: ${factura.fecha}`;
+                    invoiceRecords.appendChild(li);
+                });
+            } else {
+                invoiceRecords.innerHTML = "No se encontraron facturas.";
+            }
         } else if (filtro === "masVendidos") {
             // Muestra solo un producto si es el más vendido
             if (data.length > 0) {
@@ -532,17 +537,24 @@ function cargarFacturas() {
                 let li = document.createElement("li");
                 li.textContent = `Producto: ${producto.nombre} - Vendidos: ${producto.totalvendido}`;
                 invoiceRecords.appendChild(li);
+            } else {
+                invoiceRecords.innerHTML = "No se encontraron productos más vendidos.";
             }
         } else if (filtro === "mensual" || filtro === "semanal") {
-            data.forEach(venta => {
-                let li = document.createElement("li");
-                if(filtro === "semanal") {
-                    li.textContent = `Esta semana - Total: $${venta.total}`;
-                } else {
-                    li.textContent = `Fecha: ${venta.fecha} - Total: $${venta.total}`;
-                }
-                invoiceRecords.appendChild(li);
-            });
+            // Verifica si hay ventas mensuales o semanales y recorre los datos
+            if (data.length > 0) {
+                data.forEach(venta => {
+                    let li = document.createElement("li");
+                    if (filtro === "semanal") {
+                        li.textContent = `Esta semana - Total: $${venta.total}`;
+                    } else {
+                        li.textContent = `Fecha: ${venta.fecha} - Total: $${venta.total}`;
+                    }
+                    invoiceRecords.appendChild(li);
+                });
+            } else {
+                invoiceRecords.innerHTML = "No se encontraron ventas en el periodo seleccionado.";
+            }
         }
     })
     .catch(err => {

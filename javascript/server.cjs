@@ -292,18 +292,18 @@ app.get("/mayorProductoVendido", (_, res) => {
     SELECT p.nombre, SUM(fd.cantidad) AS totalvendido
     FROM facturasdetalladas fd
     JOIN productos p ON fd.fkproducto = p.idproducto
-    GROUP BY fd.fkproducto
-    ORDER BY totalvendido DESC LIMIT 1`;  // LIMIT 1 para obtener solo el más vendido
-  
-  pool
-    .query(query)
-    .then((results) => {
-        console.log("Resultados de mayorProductoVendido:", results.rows); // Verifica lo que devuelve la consulta
-        res.json(results.rows);
+    GROUP BY p.nombre
+    ORDER BY totalvendido DESC
+    LIMIT 1`;
+
+  pool.query(query)
+    .then(results => {
+      console.log("Resultados de la consulta mayorProductoVendido:", results.rows); // Verifica lo que devuelve la consulta
+      res.json(results.rows);
     })
-    .catch((err) => {
-        console.error("Error en la consulta de mayorProductoVendido:", err);
-        res.status(500).json({ error: "Error al obtener el producto más vendido" });
+    .catch(err => {
+      console.error("Error en la consulta mayorProductoVendido:", err);
+      res.status(500).json({ error: "Error al obtener el producto más vendido" });
     });
 });
 
