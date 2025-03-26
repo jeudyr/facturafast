@@ -234,12 +234,18 @@ app.post("/obtenerUltimo", (req, res) => {
 
 app.post("/generarFacturaDetallada", (req, res) => {
   const { idProducto, monto, cantidad, fkFactura, fkUsuario } = req.body;
-  const query =
-    "INSERT INTO facturasdetalladas (idproducto, monto, cantidad, fkfactura, fkusuario) VALUES ($1, $2, $3, $4, $5)";
-  pool
-    .query(query, [idProducto, monto, cantidad, fkFactura, fkUsuario])
-    .then(() => res.json({ message: "Detalle agregado" }))
-    .catch((err) => res.status(500).json({ error: "Error al agregar detalle" }));
+
+  // Insertar el detalle de la factura en facturasdetalladas
+  const query = `
+    INSERT INTO facturasdetalladas (fkproducto, monto, cantidad, fkfactura, fkusuario) 
+    VALUES ($1, $2, $3, $4, $5)
+  `;
+  pool.query(query, [idProducto, monto, cantidad, fkFactura, fkUsuario])
+    .then(() => res.json({ message: "Detalle agregado correctamente" }))
+    .catch((err) => {
+      console.error("Error al agregar el detalle:", err);
+      res.status(500).json({ error: "Error al agregar el detalle" });
+    });
 });
 
 // PDF Generación

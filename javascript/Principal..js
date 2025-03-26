@@ -394,111 +394,106 @@ function actualizarListaFacturacion() {
 }
 
 async function generarFactura() {
-    let totalAmountElement = document.getElementById('totalAmount');
-    let montoTotal = parseFloat(totalAmountElement.textContent) || 0; // Asegurar que sea un número
+    try {
+        let totalAmountElement = document.getElementById('totalAmount');
+        let montoTotal = parseFloat(totalAmountElement.textContent) || 0;
 
-    // **Obtener la fecha formateada correctamente en YYYY-MM-DD**
-    let fechaHoy = new Date();
-    let fechaLocal = new Date(fechaHoy.getTime() - (6 * 60 * 60 * 1000)); // Ajuste para Costa Rica (UTC-6)
-    let fecha = fechaLocal.toISOString().split('T')[0]; // Obtener solo la parte YYYY-MM-DD
+        let fechaHoy = new Date();
+        let fechaLocal = new Date(fechaHoy.getTime() - (6 * 60 * 60 * 1000)); // Ajuste para Costa Rica (UTC-6)
+        let fecha = fechaLocal.toISOString().split('T')[0]; 
 
-    console.log("📅 Fecha formateada:", fecha); // Verificación en consola
+        console.log("📅 Fecha formateada:", fecha);
 
-    // **1️⃣ Insertar la factura principal**
-    let facturaResponse = await fetch("https://facturafast.onrender.com/generarFactura", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fecha, montoTotal }) 
-    });
-    
-    let facturaData = await facturaResponse.json();
-    if (!facturaData.message) {
-        alert("Error al generar la factura");
-        return;
-    }
-
-    // **2️⃣ Obtener el último ID de factura generado**
-    let fkFactura = -1;
-    let obtenerUltimaFactura = await fetch("https://facturafast.onrender.com/obtenerUltimo", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" }
-    });
-
-    let facturaUltima = await obtenerUltimaFactura.json();
-    if (facturaUltima.length > 0) {
-        fkFactura = facturaUltima[0].idfactura;
-    } else {
-        alert("Error: No se encontró la última factura generada.");
-        return;
-    }
-    
-    // **3️⃣ Procesar productos en la factura**
-    let productosFactura = []; // Para enviar al PDF
-
-    for (let producto of productosFacturar) {
-        let ProductoSeleccionado = productos.find(p => p.idproducto == producto.idproducto);
-        let cantidad = producto.cantidad;
-        let monto = producto.precio * cantidad;
-        let idTemp = producto.idproducto;
-        let nuevaCantidadDisponible = Math.round(ProductoSeleccionado.cantidad - cantidad);
-        
-        // **4️⃣ Actualizar la cantidad en el inventario**
-        await fetch("https://facturafast.onrender.com/editar", {
+        let facturaResponse = await fetch("https://facturafast.onrender.com/generarFactura", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-                nombre: producto.nombre, 
-                descripcion: producto.descripcion, 
-                cantidad: nuevaCantidadDisponible, 
-                precio: producto.precio, 
-                idTemp 
-            }) 
+            body: JSON.stringify({ fecha, montoTotal }) 
         });
 
-        let idProducto = idTemp;
-        let fkUsuario = localStorage.getItem("loggedInUser");
+        let facturaData = await facturaResponse.json();
+        if (!facturaData.message) {
+            alert("Error al generar la factura");
+            return;
+        }
 
-        // **5️⃣ Insertar el detalle de la factura**
-        await fetch("https://facturafast.onrender.com/generarFacturaDetallada", {
+        let fkFactura = -1;
+        let obtenerUltimaFactura = await fetch("https://facturafast.onrender.com/obtenerUltimo", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+        });
+
+        let facturaUltima = await obtenerUltimaFactura.json();
+        if (facturaUltima.length > 0) {
+            fkFactura = facturaUltima[0].idfactura;
+        } else {
+            alert("Error: No se encontró la última factura generada.");
+            return;
+        }
+
+        let productosFactura = [];
+        for (let producto of productosFacturar) {
+            let ProductoSeleccionado = productos.find(p => p.idproducto == producto.idproducto);
+            let cantidad = producto.cantidad;
+            let monto = producto.precio * cantidad;
+            let idTemp = producto.idproducto;
+            let nuevaCantidadDisponible = Math.round(ProductoSeleccionado.cantidad - cantidad);
+
+            await fetch("https://facturafast.onrender.com/editar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    nombre: producto.nombre, 
+                    descripcion: producto.descripcion, 
+                    cantidad: nuevaCantidadDisponible, 
+                    precio: producto.precio, 
+                    idTemp 
+                })
+            });
+
+            let idProducto = idTemp;
+            let fkUsuario = localStorage.getItem("loggedInUser");
+
+            await fetch("https://facturafast.onrender.com/generarFacturaDetallada", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ idProducto, monto , cantidad, fkFactura, fkUsuario }) 
+            });
+
+            productosFactura.push({
+                nombre: producto.nombre,
+                cantidad: producto.cantidad,
+                monto: producto.precio * producto.cantidad
+            });
+        }
+
+        let pdfResponse = await fetch("https://facturafast.onrender.com/generarPDF", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ idProducto, monto , cantidad, fkFactura, fkUsuario}) 
+            body: JSON.stringify({ idFactura: fkFactura, fecha, montoTotal, productos: productosFactura })
         });
 
-        // Agregar el producto al array para generar el PDF
-        productosFactura.push({
-            nombre: producto.nombre,
-            cantidad: producto.cantidad,
-            monto: producto.precio * producto.cantidad
-        });
+        if (pdfResponse.ok) {
+            let blob = await pdfResponse.blob();
+            let url = window.URL.createObjectURL(blob);
+            let a = document.createElement("a");
+            a.href = url;
+            a.download = `factura_${fkFactura}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } else {
+            alert("Error al generar el PDF");
+        }
+
+        listaFacturacion.innerHTML = "";
+        let totalAmount = 0;
+        totalAmountElement.textContent = totalAmount.toFixed(2);
+
+        alert("Factura generada correctamente.");
+    } catch (error) {
+        console.error("Error en la generación de la factura:", error);
+        alert("Hubo un error al generar la factura. Por favor, intente nuevamente.");
     }
-
-    // **6️⃣ Generar y descargar el PDF**
-    let pdfResponse = await fetch("https://facturafast.onrender.com/generarPDF", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idFactura: fkFactura, fecha, montoTotal, productos: productosFactura })
-    });
-
-    if (pdfResponse.ok) {
-        let blob = await pdfResponse.blob();
-        let url = window.URL.createObjectURL(blob);
-        let a = document.createElement("a");
-        a.href = url;
-        a.download = `factura_${fkFactura}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    } else {
-        alert("Error al generar el PDF");
-    }
-
-    // **7️⃣ Limpiar la lista de facturación y resetear el total**
-    listaFacturacion.innerHTML = "";
-    let totalAmount = 0;
-    totalAmountElement.textContent = totalAmount.toFixed(2);
-
-    alert("Factura generada correctamente.");
 }
 
 function cargarFacturas() {
