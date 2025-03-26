@@ -279,13 +279,14 @@ app.get("/mayorProductoVendido", (_, res) => {
   const query = `
     SELECT p.nombre, SUM(fd.cantidad) AS totalvendido
     FROM facturasdetalladas fd
-    JOIN productos p ON fd.idproducto = p.idproducto
-    GROUP BY fd.idproducto
+    JOIN productos p ON fd.fkproducto = p.idproducto
+    GROUP BY p.nombre
     ORDER BY totalvendido DESC LIMIT 5`;
+
   pool
     .query(query)
     .then((results) => res.json(results.rows))
-    .catch((err) => res.status(500).json({ error: "Error" }));
+    .catch((err) => res.status(500).json({ error: "Error al obtener los productos más vendidos", details: err }));
 });
 
 app.get("/ventasMensuales", (_, res) => {

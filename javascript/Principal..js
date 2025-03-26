@@ -526,7 +526,7 @@ function cargarFacturas() {
             if (filtro === "todas") {
                 data.forEach(factura => {
                     let li = document.createElement("li");
-                    li.textContent = `Factura #${factura.idfactura} - Total: $${factura.montoTotal} - Fecha: ${factura.fecha}`;
+                    li.textContent = `Factura #${factura.idfactura} - Total: $${factura.montototal} - Fecha: ${factura.fecha}`;
                     invoiceRecords.appendChild(li);
                 });
             } else if (filtro === "masVendidos") {
