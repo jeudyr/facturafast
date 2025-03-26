@@ -10,7 +10,8 @@
 <body>
     <div class="registrar">
         <form id="registrar">
-            <input type="text" id="usuario" placeholder="Usuario" required>
+            
+            <input type="text" id="usuario" placeholder="Usuario" oninput="this.value = this.value.toLowerCase()"required>
             <input type="password" id="contrasena" placeholder="Contraseña" required>
             <input type="text" id="nombre" placeholder="Nombre" required>
             <input type="text" id="apellidos" placeholder="Apellidos" required>
