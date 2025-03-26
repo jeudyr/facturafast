@@ -10,7 +10,8 @@ document.getElementById('registrar').addEventListener('submit', generar);
 
 async function generar(event) {
     event.preventDefault();  
-    mantenerDatos();
+    let validar=mantenerDatos();
+    if(validar==false) return;
     const Valido = await validarExistencia();
     if (Valido==false) return;
     generarCorreos();
@@ -74,7 +75,7 @@ function verificarCodigo() {
     }
 }
 
-function mantenerDatos() {
+async function mantenerDatos() {
     event.preventDefault(); // Evitar recargar la página
 
     usuario = document.getElementById('usuario').value;
@@ -87,7 +88,7 @@ function mantenerDatos() {
     // Verificar que todos los campos estén completos
     if (!usuario || !contrasena || !nombre || !apellidos || !correo || !celular) {
         alert("Todos los campos son obligatorios");
-        return;
+        return false;
     }
 
     // Expresión regular para validar el formato del correo
@@ -95,8 +96,16 @@ function mantenerDatos() {
     
     if (!correoValido.test(correo)) {
         alert("Por favor ingresa un correo electrónico válido");
-        return;
+        return false;
     }
+
+    let celularValido = /^\d{10}$/;
+    if (!celularValido.test(celular)) {
+        alert("Por favor ingresa un número de celular válido de 8 dígitos");
+        return false;
+    }
+
+    return true;
 }
 
 function guardarDatos(){
