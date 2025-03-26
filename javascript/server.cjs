@@ -333,26 +333,44 @@ app.post("/generarPDF", (req, res) => {
   });
 });
 
-// STATS
-app.get("/obtenerFacturas", (_, res) => {
-  pool
-    .query("SELECT * FROM facturas")
-    .then((results) => res.json(results.rows))
-    .catch((err) => res.status(500).json({ error: "Error" }));
+
+app.get("/obtenerFacturas", (req, res) => {
+  const { usuario } = req.query;  // Obtener el usuario desde los parámetros de la consulta
+
+  if (!usuario) {
+    return res.status(400).json({ error: "Usuario es necesario." });
+  }
+
+  const query = `
+    SELECT f.idfactura, f.fecha, f.montototal
+    FROM facturas f
+    JOIN facturasdetalladas fd ON f.idfactura = fd.fkfactura
+    WHERE fd.fkusuario = $1;
+  `;
+
+  pool.query(query, [usuario])
+    .then(results => res.json(results.rows))
+    .catch(err => {
+      console.error("Error al obtener facturas:", err);
+      res.status(500).json({ error: "Error al obtener facturas." });
+    });
 });
 
-app.get("/mayorProductoVendido", (_, res) => {
+app.post("/mayorProductoVendido", (req, res) => {
+  const { usuario } = req.body;  // Obtener el usuario del cuerpo de la solicitud
+
   const query = `
     SELECT p.nombre, SUM(fd.cantidad) AS totalvendido
     FROM facturasdetalladas fd
     JOIN productos p ON fd.fkproducto = p.idproducto
+    WHERE fd.fkusuario = $1
     GROUP BY p.nombre
     ORDER BY totalvendido DESC
     LIMIT 1`;
 
-  pool.query(query)
+  pool.query(query, [usuario])
     .then(results => {
-      console.log("Resultados de la consulta mayorProductoVendido:", results.rows); // Verifica lo que devuelve la consulta
+      console.log("Resultados de la consulta mayorProductoVendido:", results.rows);
       res.json(results.rows);
     })
     .catch(err => {
@@ -361,15 +379,18 @@ app.get("/mayorProductoVendido", (_, res) => {
     });
 });
 
-app.get("/ventasMensuales", (_, res) => {
+app.post("/ventasMensuales", (req, res) => {
+  const { usuario } = req.body;  // Obtener el usuario del cuerpo de la solicitud
+
   const query = `
     SELECT TO_CHAR(fecha, 'YYYY-MM') AS fecha, SUM(montototal) AS total
     FROM facturas
+    JOIN facturasdetalladas fd ON facturas.idfactura = fd.fkfactura
+    WHERE fd.fkusuario = $1
     GROUP BY TO_CHAR(fecha, 'YYYY-MM')
-    ORDER BY fecha DESC`; // Agrupamos correctamente por año y mes, y ordenamos de forma descendente
+    ORDER BY fecha DESC`;
 
-  pool
-    .query(query)
+  pool.query(query, [usuario])
     .then((results) => res.json(results.rows))
     .catch((err) => {
       console.error("Error al obtener las ventas mensuales", err);
@@ -377,15 +398,18 @@ app.get("/ventasMensuales", (_, res) => {
     });
 });
 
-app.get("/ventasSemanales", (_, res) => {
+app.post("/ventasSemanales", (req, res) => {
+  const { usuario } = req.body;  // Obtener el usuario del cuerpo de la solicitud
+
   const query = `
     SELECT SUM(montototal) AS total
     FROM facturas
-    WHERE fecha >= CURRENT_DATE - INTERVAL '7 days'`;
-  pool
-    .query(query)
+    JOIN facturasdetalladas fd ON facturas.idfactura = fd.fkfactura
+    WHERE fd.fkusuario = $1 AND fecha >= CURRENT_DATE - INTERVAL '7 days'`;
+
+  pool.query(query, [usuario])
     .then((results) => res.json(results.rows))
-    .catch((err) => res.status(500).json({ error: "Error" }));
+    .catch((err) => res.status(500).json({ error: "Error al obtener las ventas semanales", details: err }));
 });
 
 

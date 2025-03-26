@@ -519,8 +519,14 @@ function cargarFacturas() {
     } else if (filtro === "semanal") {
         endpoint = "/ventasSemanales";
     }
-
-    fetch(`https://facturafast.onrender.com${endpoint}`)
+    let usuario = localStorage.getItem("loggedInUser"); // Obtener el usuario guardado
+    fetch(`https://facturafast.onrender.com${endpoint}`, {
+        method: "POST",  // Asumiendo que el endpoint espera un POST con los datos
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ usuario }) // Enviar el usuario en el cuerpo de la solicitud
+    })
     .then(response => response.json())
     .then(data => {
         console.log("Datos recibidos:", data); // Verifica qué datos llegan
