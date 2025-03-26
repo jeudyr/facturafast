@@ -367,8 +367,7 @@ app.post("/mayorProductoVendido", (req, res) => {
     WHERE fd.fkusuario = $1
     GROUP BY p.nombre
     ORDER BY totalvendido DESC
-    LIMIT 1;
-  `;
+    LIMIT 1`;
 
   pool.query(query, [usuario])
     .then(results => {
@@ -385,20 +384,15 @@ app.post("/ventasMensuales", (req, res) => {
   const { usuario } = req.body;  // Obtener el usuario del cuerpo de la solicitud
 
   const query = `
-    SELECT TO_CHAR(f.fecha, 'YYYY-MM') AS fecha, SUM(f.montototal) AS total
-    FROM facturas f
-    JOIN facturasdetalladas fd ON f.idfactura = fd.fkfactura
+    SELECT TO_CHAR(f.fecha, 'YYYY-MM') AS fecha, SUM(fd.monto) AS total
+    FROM facturasdetalladas fd
     WHERE fd.fkusuario = $1
     GROUP BY TO_CHAR(f.fecha, 'YYYY-MM')
     ORDER BY fecha DESC;
   `;
 
   pool.query(query, [usuario])
-    .then((results) => {
-      // Si quieres solo un total por mes sin duplicaciones
-      let totalVentas = results.rows.reduce((total, row) => total + parseFloat(row.total), 0);
-      res.json([{ fecha: 'Total', total: totalVentas.toFixed(2) }]); // Mostrar el total de ventas
-    })
+    .then((results) => res.json(results.rows))
     .catch((err) => {
       console.error("Error al obtener las ventas mensuales", err);
       res.status(500).json({ error: "Error al obtener las ventas mensuales", details: err });
@@ -409,16 +403,14 @@ app.post("/ventasSemanales", (req, res) => {
   const { usuario } = req.body;  // Obtener el usuario del cuerpo de la solicitud
 
   const query = `
-    SELECT SUM(f.montototal) AS total
-    FROM facturas f
-    JOIN facturasdetalladas fd ON f.idfactura = fd.fkfactura
+    SELECT SUM(fd.monto) AS total
+    FROM facturasdetalladas fd
     WHERE fd.fkusuario = $1 
-      AND f.fecha >= CURRENT_DATE - INTERVAL '7 days'
+      AND fd.fecha >= CURRENT_DATE - INTERVAL '7 days';
   `;
 
   pool.query(query, [usuario])
     .then((results) => {
-      // El total ya debería estar calculado correctamente en la consulta
       const total = results.rows.length > 0 ? parseFloat(results.rows[0].total) : 0;
       res.json([{ total: total.toFixed(2) }]); // Devolvemos un único objeto con el total calculado
     })
