@@ -293,11 +293,16 @@ app.get("/ventasMensuales", (_, res) => {
   const query = `
     SELECT TO_CHAR(fecha, 'YYYY-MM') AS fecha, SUM(montototal) AS total
     FROM facturas
-    GROUP BY fecha`;
+    GROUP BY TO_CHAR(fecha, 'YYYY-MM')
+    ORDER BY fecha DESC`; // Agrupamos correctamente por año y mes, y ordenamos de forma descendente
+
   pool
     .query(query)
     .then((results) => res.json(results.rows))
-    .catch((err) => res.status(500).json({ error: "Error" }));
+    .catch((err) => {
+      console.error("Error al obtener las ventas mensuales", err);
+      res.status(500).json({ error: "Error al obtener las ventas mensuales", details: err });
+    });
 });
 
 app.get("/ventasSemanales", (_, res) => {
