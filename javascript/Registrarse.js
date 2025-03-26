@@ -104,7 +104,7 @@ async function mantenerDatos() {
         return false;
     }
 
-    let celularValido = /^\d{10}$/;
+    let celularValido = /^\d{8}$/;
     if (!celularValido.test(celular)) {
         alert("Por favor ingresa un número de celular válido de 8 dígitos");
         return false;
