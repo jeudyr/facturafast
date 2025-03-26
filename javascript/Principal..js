@@ -388,10 +388,10 @@ function actualizarListaFacturacion() {
         Cantidad: ${producto.cantidad} | 
         Precio: $${(producto.precio * producto.cantidad).toFixed(2)}
         <span class="button-container">
-            <button class="edit-button btn btn-edit" onclick="editProductFacturacion(${producto.idProducto})">
+            <button class="edit-button btn btn-edit" onclick="editProductFacturacion(${producto.idproducto})">
                 📝
             </button>
-            <button class="delete-button btn btn-delete" onclick="eliminarProductoFacturacion(${producto.idProducto})">
+            <button class="delete-button btn btn-delete" onclick="eliminarProductoFacturacion(${producto.idproducto})">
                 🗑️
             </button>
         </span>
