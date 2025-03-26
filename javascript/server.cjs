@@ -180,7 +180,7 @@ app.post("/guardarProductos", (req, res) => {
 app.post("/editar", (req, res) => {
   const { nombre, descripcion, cantidad, precio, idTemp } = req.body;
   const query =
-    "UPDATE productos SET nombre = $1, descripcion = $2, cantidad = $3, precio = $4 WHERE idProducto = $5";
+    "UPDATE productos SET nombre = $1, descripcion = $2, cantidad = $3, precio = $4 WHERE idproducto = $5";
   pool
     .query(query, [nombre, descripcion, cantidad, precio, idTemp])
     .then(() => res.json({ message: "Producto editado" }))
@@ -203,7 +203,7 @@ app.post("/productos", (req, res) => {
 app.post("/editarMostrar", (req, res) => {
   const { idProducto } = req.body;
   pool
-    .query("SELECT * FROM productos WHERE idProducto = $1", [idProducto])
+    .query("SELECT * FROM productos WHERE idproducto = $1", [idProducto])
     .then((results) => res.json({ producto: results.rows[0] }))
     .catch((err) => res.status(500).json({ error: "Error al obtener el producto" }));
 });
@@ -211,7 +211,7 @@ app.post("/editarMostrar", (req, res) => {
 app.post("/eliminarProducto", (req, res) => {
   const { idProducto } = req.body;
   pool
-    .query("DELETE FROM productos WHERE idProducto = $1", [idProducto])
+    .query("DELETE FROM productos WHERE idproducto = $1", [idProducto])
     .then(() => res.json({ message: "Producto eliminado" }))
     .catch((err) => res.status(500).json({ error: "Error al eliminar el producto" }));
 });
@@ -220,14 +220,14 @@ app.post("/eliminarProducto", (req, res) => {
 app.post("/generarFactura", (req, res) => {
   const { fecha, montoTotal } = req.body;
   pool
-    .query("INSERT INTO facturas (fecha, montoTotal) VALUES ($1, $2)", [fecha, montoTotal])
+    .query("INSERT INTO facturas (fecha, montototal) VALUES ($1, $2)", [fecha, montoTotal])
     .then(() => res.json({ message: "Factura creada" }))
     .catch((err) => res.status(500).json({ error: "Error al crear factura" }));
 });
 
 app.post("/obtenerUltimo", (req, res) => {
   pool
-    .query("SELECT idFactura FROM facturas ORDER BY idFactura DESC LIMIT 1")
+    .query("SELECT idfactura FROM facturas ORDER BY idfactura DESC LIMIT 1")
     .then((results) => res.json(results.rows))
     .catch((err) => res.status(500).json({ error: "Error al obtener última factura" }));
 });
@@ -235,7 +235,7 @@ app.post("/obtenerUltimo", (req, res) => {
 app.post("/generarFacturaDetallada", (req, res) => {
   const { idProducto, monto, cantidad, fkFactura, fkUsuario } = req.body;
   const query =
-    "INSERT INTO facturasdetalladas (idProducto, monto, cantidad, fkFactura, fkUsuario) VALUES ($1, $2, $3, $4, $5)";
+    "INSERT INTO facturasdetalladas (idproducto, monto, cantidad, fkfactura, fkusuario) VALUES ($1, $2, $3, $4, $5)";
   pool
     .query(query, [idProducto, monto, cantidad, fkFactura, fkUsuario])
     .then(() => res.json({ message: "Detalle agregado" }))
@@ -277,11 +277,11 @@ app.get("/obtenerFacturas", (_, res) => {
 
 app.get("/mayorProductoVendido", (_, res) => {
   const query = `
-    SELECT p.nombre, SUM(fd.cantidad) AS totalVendido
+    SELECT p.nombre, SUM(fd.cantidad) AS totalvendido
     FROM facturasdetalladas fd
-    JOIN productos p ON fd.idProducto = p.idProducto
-    GROUP BY fd.idProducto
-    ORDER BY totalVendido DESC LIMIT 5`;
+    JOIN productos p ON fd.idproducto = p.idproducto
+    GROUP BY fd.idproducto
+    ORDER BY totalvendido DESC LIMIT 5`;
   pool
     .query(query)
     .then((results) => res.json(results.rows))
@@ -290,7 +290,7 @@ app.get("/mayorProductoVendido", (_, res) => {
 
 app.get("/ventasMensuales", (_, res) => {
   const query = `
-    SELECT TO_CHAR(fecha, 'YYYY-MM') AS fecha, SUM(montoTotal) AS total
+    SELECT TO_CHAR(fecha, 'YYYY-MM') AS fecha, SUM(montototal) AS total
     FROM facturas
     GROUP BY fecha`;
   pool
@@ -301,7 +301,7 @@ app.get("/ventasMensuales", (_, res) => {
 
 app.get("/ventasSemanales", (_, res) => {
   const query = `
-    SELECT SUM(montoTotal) AS total
+    SELECT SUM(montototal) AS total
     FROM facturas
     WHERE fecha >= CURRENT_DATE - INTERVAL '7 days'`;
   pool

@@ -230,7 +230,7 @@ function eliminarProducto(idProducto) {
     })
     .catch(err => {
         console.error("Error al editar producto:", err);
-        alert("Error al editar el producto");
+        alert("Error al eliminar el producto");
     });
 }
 
