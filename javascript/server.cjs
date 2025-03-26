@@ -94,6 +94,37 @@ app.post("/login", (req, res) => {
   });
 });
 
+app.post("/verify-password", (req, res) => {
+  const { usuario, contrasena } = req.body;
+
+  if (!usuario || !contrasena) {
+      return res.status(400).json({ error: "Usuario y contraseña son necesarios." });
+  }
+
+  // Consulta a la base de datos para obtener la contraseña almacenada
+  const query = "SELECT contrasena FROM usuarios WHERE usuario = $1";
+  pool.query(query, [usuario])
+      .then(result => {
+          if (result.rows.length === 0) {
+              return res.status(404).json({ error: "Usuario no encontrado." });
+          }
+
+          // Comparar la contraseña ingresada con la almacenada en la base de datos
+          const storedPassword = result.rows[0].contrasena;
+          
+          if (contrasena === storedPassword) {
+              // Si las contraseñas coinciden, se puede cambiar el rol u otras acciones
+              res.json({ valid: true });
+          } else {
+              res.status(400).json({ valid: false});
+          }
+      })
+      .catch(err => {
+          console.error("Error en la consulta:", err);
+          res.status(500).json({ error: "Error en la verificación." });
+      });
+});
+
 // REGISTRO
 app.post("/usuarios", (req, res) => {
   const { usuario, contrasena, nombre, apellidos, correo, celular } = req.body;
