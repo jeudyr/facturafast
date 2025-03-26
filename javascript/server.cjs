@@ -334,8 +334,8 @@ app.post("/generarPDF", (req, res) => {
 });
 
 
-app.get("/obtenerFacturas", (req, res) => {
-  const { usuario } = req.query;  // Obtener el usuario desde los parámetros de la consulta
+app.post("/obtenerFacturas", (req, res) => {
+  const { usuario } = req.body;  // Obtener el usuario desde el cuerpo de la solicitud
 
   if (!usuario) {
     return res.status(400).json({ error: "Usuario es necesario." });

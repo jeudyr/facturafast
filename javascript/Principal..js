@@ -195,9 +195,6 @@ function updateProductList() {
                 <button class="edit-button btn btn-edit" onclick="editProduct(${product.idproducto})">
                     📝
                 </button>
-                <button class="delete-button btn btn-delete" onclick="eliminarProducto(${product.idproducto})">
-                    🗑️
-                </button>
             </span>
             `;
             productosLista.appendChild(li);
@@ -521,11 +518,11 @@ function cargarFacturas() {
     }
     let usuario = localStorage.getItem("loggedInUser"); // Obtener el usuario guardado
     fetch(`https://facturafast.onrender.com${endpoint}`, {
-        method: "GET",  // Asumiendo que el endpoint espera un POST con los datos
+        method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ usuario }) // Enviar el usuario en el cuerpo de la solicitud
+        body: JSON.stringify({ usuario }) // Esto no es necesario con GET, puedes enviar usuario como query string
     })
     .then(response => response.json())
     .then(data => {
