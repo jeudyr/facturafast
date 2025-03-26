@@ -304,7 +304,7 @@ function agregarFactura(event) {
             </button>
         </span>
     `;
-listaFacturacion.appendChild(li);
+    listaFacturacion.appendChild(li);
     
     listaFacturacion.appendChild(li);
 
@@ -488,6 +488,7 @@ async function generarFactura() {
         listaFacturacion.innerHTML = "";
         let totalAmount = 0;
         totalAmountElement.textContent = totalAmount.toFixed(2);
+        productosFacturar=[];
         updateProductList();
 
         alert("Factura generada correctamente.");

@@ -40,6 +40,9 @@ app.get('/Principal.html', (req, res) => {
   res.sendFile(path.join(__dirname, "../html/Principal.html"));
 });
 
+app.get('/Registrarse.html', (req, res) => {
+  res.sendFile(path.join(__dirname, "../html/Registrarse.html"));
+});
 // Conexión a la base de datos PostgreSQL
 const pool = new Pool({
   host: process.env.DB_HOST,
