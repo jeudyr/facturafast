@@ -13,14 +13,11 @@ const path = require("path");
 const fs = require("fs");
 const PDFDocument = require("pdfkit");
 
-const SibApiV3Sdk = require("sib-api-v3-sdk");
-
-// Configura la API de Brevo (SendinBlue)
+const SibApiV3Sdk = require('sib-api-v3-sdk');
 const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+
 const apiKey = process.env.BREVO_API_KEY;
-
 SibApiV3Sdk.ApiClient.instance.authentications['api-key'].apiKey = apiKey;
-
 const app = express();
 
 // Inicialización de middlewares
@@ -43,6 +40,15 @@ app.get('/Principal.html', (req, res) => {
 app.get('/Registrarse.html', (req, res) => {
   res.sendFile(path.join(__dirname, "../html/Registrarse.html"));
 });
+
+app.get('/index.html', (req, res) => {
+  res.sendFile(path.join(__dirname, "../html/index.html"));
+});
+
+app.get('/RecuperarContrasena.html', (req, res) => {
+  res.sendFile(path.join(__dirname, "../html/RecuperarContrasena.html"));
+});
+
 // Conexión a la base de datos PostgreSQL
 const pool = new Pool({
   host: process.env.DB_HOST,

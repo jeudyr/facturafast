@@ -101,7 +101,7 @@ function mantenerDatos() {
 
 function guardarDatos(){
     console.log("🔍 Datos a enviar:", { usuario, contrasena, nombre, apellidos, correo, celular });
-    fetch("http://localhost:3000/usuarios", {
+    fetch("https://facturafast.onrender.com/usuarios", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
