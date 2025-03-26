@@ -166,6 +166,10 @@ document.getElementById('productForm').addEventListener('submit', function(event
     this.reset();
 });
 
+function cerrar(){
+    window.location.href = "/index.html"; 
+}
+
 function updateProductList() {
     let productosLista = document.getElementById("productList");
     productosLista.innerHTML = ""; // Limpiar la lista

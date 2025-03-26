@@ -31,3 +31,5 @@ document.getElementById('login').addEventListener('submit', function(event) {
     })
     .catch(error => console.error("Error en la petición:", error));
 });
+
+
