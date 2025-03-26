@@ -521,7 +521,7 @@ function cargarFacturas() {
     }
     let usuario = localStorage.getItem("loggedInUser"); // Obtener el usuario guardado
     fetch(`https://facturafast.onrender.com${endpoint}`, {
-        method: "POST",  // Asumiendo que el endpoint espera un POST con los datos
+        method: "GET",  // Asumiendo que el endpoint espera un POST con los datos
         headers: {
             "Content-Type": "application/json"
         },
