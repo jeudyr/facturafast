@@ -18,6 +18,8 @@ function generarCorreos(event) {
 function agregarCampoVerificacion() {
     const container = document.getElementById("codigo-container");
     container.innerHTML = "";
+    const container2 = document.getElementById("formularioRecuperacion");
+    container2.innerHTML = "";
     const inputCodigo = document.createElement("input");
     inputCodigo.type = "text";
     inputCodigo.id = "codigoIngresado";
