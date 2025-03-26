@@ -394,7 +394,11 @@ app.post("/ventasMensuales", (req, res) => {
   `;
 
   pool.query(query, [usuario])
-    .then((results) => res.json(results.rows))
+    .then((results) => {
+      // Si quieres solo un total por mes sin duplicaciones
+      let totalVentas = results.rows.reduce((total, row) => total + parseFloat(row.total), 0);
+      res.json([{ fecha: 'Total', total: totalVentas.toFixed(2) }]); // Mostrar el total de ventas
+    })
     .catch((err) => {
       console.error("Error al obtener las ventas mensuales", err);
       res.status(500).json({ error: "Error al obtener las ventas mensuales", details: err });
@@ -410,13 +414,13 @@ app.post("/ventasSemanales", (req, res) => {
     JOIN facturasdetalladas fd ON f.idfactura = fd.fkfactura
     WHERE fd.fkusuario = $1 
       AND f.fecha >= CURRENT_DATE - INTERVAL '7 days'
-    GROUP BY f.idfactura;
   `;
 
   pool.query(query, [usuario])
     .then((results) => {
-      const total = results.rows.reduce((sum, row) => sum + parseFloat(row.total), 0); // Aseguramos que sumemos correctamente
-      res.json([{ total }]); // Devolvemos un único objeto con el total calculado
+      // El total ya debería estar calculado correctamente en la consulta
+      const total = results.rows.length > 0 ? parseFloat(results.rows[0].total) : 0;
+      res.json([{ total: total.toFixed(2) }]); // Devolvemos un único objeto con el total calculado
     })
     .catch((err) => res.status(500).json({ error: "Error al obtener las ventas semanales", details: err }));
 });
