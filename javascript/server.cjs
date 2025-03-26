@@ -294,10 +294,17 @@ app.get("/mayorProductoVendido", (_, res) => {
     JOIN productos p ON fd.fkproducto = p.idproducto
     GROUP BY fd.fkproducto
     ORDER BY totalvendido DESC LIMIT 1`;  // LIMIT 1 para obtener solo el más vendido
+  
   pool
     .query(query)
-    .then((results) => res.json(results.rows))
-    .catch((err) => res.status(500).json({ error: "Error" }));
+    .then((results) => {
+        console.log("Resultados de mayorProductoVendido:", results.rows); // Verifica lo que devuelve la consulta
+        res.json(results.rows);
+    })
+    .catch((err) => {
+        console.error("Error en la consulta de mayorProductoVendido:", err);
+        res.status(500).json({ error: "Error al obtener el producto más vendido" });
+    });
 });
 
 app.get("/ventasMensuales", (_, res) => {

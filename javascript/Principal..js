@@ -512,40 +512,42 @@ function cargarFacturas() {
     }
 
     fetch(`https://facturafast.onrender.com${endpoint}`)
-        .then(response => response.json())
-        .then(data => {
-            let invoiceRecords = document.getElementById("invoiceRecords");
-            invoiceRecords.innerHTML = ""; 
+    .then(response => response.json())
+    .then(data => {
+        console.log("Datos recibidos:", data); // Verifica qué datos llegan
+        let invoiceRecords = document.getElementById("invoiceRecords");
+        invoiceRecords.innerHTML = "";  // Limpiar la lista
 
-            // Dependiendo del filtro, mostrar los datos
-            if (filtro === "todas") {
-                data.forEach(factura => {
-                    let li = document.createElement("li");
-                    li.textContent = `Factura #${factura.idfactura} - Total: $${factura.montototal} - Fecha: ${factura.fecha}`;
-                    invoiceRecords.appendChild(li);
-                });
-            } else if (filtro === "masVendidos") {
-                data.forEach(producto => {
-                    let li = document.createElement("li");
-                    li.textContent = `Producto: ${producto.nombre} - Vendidos: ${producto.totalvendido}`;
-                    invoiceRecords.appendChild(li);
-                });
-            } else if (filtro === "mensual" || filtro === "semanal") {
-                data.forEach(venta => {
-                    let li = document.createElement("li");
-                    if(filtro==="semanal"){
-                        li.textContent = `Esta semana - Total: $${venta.total}`;
-                    }else{
-                        li.textContent = `Fecha: ${venta.fecha} - Total: $${venta.total}`;
-                    }
-                    
-                    invoiceRecords.appendChild(li);
-                });
+        // Dependiendo del filtro, mostrar los datos
+        if (filtro === "todas") {
+            data.forEach(factura => {
+                let li = document.createElement("li");
+                li.textContent = `Factura #${factura.idfactura} - Total: $${factura.montototal} - Fecha: ${factura.fecha}`;
+                invoiceRecords.appendChild(li);
+            });
+        } else if (filtro === "masVendidos") {
+            // Muestra solo un producto si es el más vendido
+            if (data.length > 0) {
+                let producto = data[0];  // Tomamos el primer producto si es único
+                let li = document.createElement("li");
+                li.textContent = `Producto: ${producto.nombre} - Vendidos: ${producto.totalvendido}`;
+                invoiceRecords.appendChild(li);
             }
-        })
-        .catch(err => {
-            console.error("Error al obtener los registros de facturas:", err);
-            alert("Error al cargar los datos.");
-        });
+        } else if (filtro === "mensual" || filtro === "semanal") {
+            data.forEach(venta => {
+                let li = document.createElement("li");
+                if(filtro === "semanal") {
+                    li.textContent = `Esta semana - Total: $${venta.total}`;
+                } else {
+                    li.textContent = `Fecha: ${venta.fecha} - Total: $${venta.total}`;
+                }
+                invoiceRecords.appendChild(li);
+            });
+        }
+    })
+    .catch(err => {
+        console.error("Error al obtener los registros de facturas:", err);
+        alert("Error al cargar los datos.");
+    });
 }
 
