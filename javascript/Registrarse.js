@@ -10,10 +10,15 @@ document.getElementById('registrar').addEventListener('submit', generar);
 
 async function generar(event) {
     event.preventDefault();  
-    let validar=mantenerDatos();
-    if(validar==false) return;
+    let validar = await mantenerDatos();
+    if(validar==false){
+        return;
+    } 
     const Valido = await validarExistencia();
-    if (Valido==false) return;
+    if (Valido==false){
+        return;
+    } 
+
     generarCorreos();
 }
 
