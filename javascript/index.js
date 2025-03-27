@@ -1,5 +1,5 @@
 document.getElementById('login').addEventListener('submit', function(event) {
-    event.preventDefault(); // Evitar recargar la página
+    event.preventDefault();
 
     let usuario = document.getElementById('usuario').value;
     let contrasena = document.getElementById('contrasena').value;

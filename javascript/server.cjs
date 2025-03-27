@@ -1,13 +1,7 @@
 require('dotenv').config();
 
-// Verificar que las variables están cargadas correctamente
-console.log("DB Host:", process.env.DB_HOST);
-console.log("DB User:", process.env.DB_USER);
-console.log("DB Password:", process.env.DB_PASSWORD);
-console.log("DB Name:", process.env.DB_NAME);
-
 const express = require("express");
-const { Pool } = require('pg'); // Usamos el paquete `pg` para PostgreSQL
+const { Pool } = require('pg'); 
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
@@ -15,7 +9,6 @@ const PDFDocument = require("pdfkit");
 
 const SibApiV3Sdk = require('sib-api-v3-sdk');
 const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-
 const apiKey = process.env.BREVO_API_KEY;
 SibApiV3Sdk.ApiClient.instance.authentications['api-key'].apiKey = apiKey;
 const app = express();
@@ -26,26 +19,26 @@ app.use(express.json()); // Para poder manejar datos JSON
 
 app.use("/css", express.static(path.join(__dirname, "../css"))); // ruta para archivos CSS
 app.use("/javascript", express.static(path.join(__dirname, "../javascript"))); // ruta para archivos JS
-app.use("/html", express.static(path.join(__dirname, "../html"))); // ruta para archivos JS
-app.use("/imagenes", express.static(path.join(__dirname, "../imagenes"))); // ruta para archivos JS
+app.use("/html", express.static(path.join(__dirname, "../html"))); // ruta para archivos html
+app.use("/imagenes", express.static(path.join(__dirname, "../imagenes"))); // ruta para las imagenes
 // Ruta raíz (cuando entras al dominio)
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../html/index.html"));
 });
 
-app.get('/Principal.html', (req, res) => {
+app.get('/Principal.html', (req, res) => {//direcciona a principal
   res.sendFile(path.join(__dirname, "../html/Principal.html"));
 });
 
-app.get('/Registrarse.html', (req, res) => {
+app.get('/Registrarse.html', (req, res) => {//direcciona a registrarse
   res.sendFile(path.join(__dirname, "../html/Registrarse.html"));
 });
 
-app.get('/index.html', (req, res) => {
+app.get('/index.html', (req, res) => {//direcciona al lobby
   res.sendFile(path.join(__dirname, "../html/index.html"));
 });
 
-app.get('/Recuperar_Contrasena.html', (req, res) => {
+app.get('/Recuperar_Contrasena.html', (req, res) => {//direcciona a recuperar contraseña
   res.sendFile(path.join(__dirname, "../html/Recuperar_Contrasena.html"));
 });
 
@@ -56,7 +49,7 @@ const pool = new Pool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  ssl: { rejectUnauthorized: false },  // Si tu conexión requiere SSL
+  ssl: { rejectUnauthorized: false },
 });
 
 pool.connect((err, client, release) => {
@@ -68,7 +61,6 @@ pool.connect((err, client, release) => {
   release();
 });
 
-// Puerto dinámico para Render (o 3000 si estamos en local)
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
@@ -76,10 +68,9 @@ app.listen(port, () => {
 });
 
 
-app.post("/login", (req, res) => {
+app.post("/login", (req, res) => {//confirma si lo datos estan en la tabla para el login
   const { usuario, contrasena } = req.body;
 
-  // Usamos una consulta SQL con PostgreSQL (pg)
   const query = "SELECT * FROM usuarios WHERE usuario = $1 AND contrasena = $2";
 
   // Ejecutamos la consulta
@@ -94,7 +85,7 @@ app.post("/login", (req, res) => {
   });
 });
 
-app.post("/verify-password", (req, res) => {
+app.post("/verify-password", (req, res) => {//verifica si la contraseña es correcta del usuario
   const { usuario, contrasena } = req.body;
 
   if (!usuario || !contrasena) {
@@ -113,7 +104,6 @@ app.post("/verify-password", (req, res) => {
           const storedPassword = result.rows[0].contrasena;
           
           if (contrasena === storedPassword) {
-              // Si las contraseñas coinciden, se puede cambiar el rol u otras acciones
               res.json({ valid: true });
           } else {
               res.status(400).json({ valid: false});
@@ -125,8 +115,8 @@ app.post("/verify-password", (req, res) => {
       });
 });
 
-// REGISTRO
-app.post("/usuarios", (req, res) => {
+
+app.post("/usuarios", (req, res) => {//guarda un nuevo usuario en la bd
   const { usuario, contrasena, nombre, apellidos, correo, celular } = req.body;
   const query =
     "INSERT INTO usuarios (usuario, contrasena, nombre, apellidos, correo, celular) VALUES ($1, $2, $3, $4, $5, $6)";
@@ -136,7 +126,7 @@ app.post("/usuarios", (req, res) => {
     .catch((err) => res.status(400).json({ error: "Usuario ya registrado" }));
 });
 
-app.post("/verificarUsuario", (req, res) => {
+app.post("/verificarUsuario", (req, res) => {//verifica si existe un usuario
   const { usuario } = req.body;
   pool
     .query("SELECT * FROM usuarios WHERE usuario = $1", [usuario])
@@ -144,7 +134,7 @@ app.post("/verificarUsuario", (req, res) => {
     .catch((err) => res.status(500).json({ error: "Error en la consulta" }));
 });
 
-app.post("/verificarCorreo", (req, res) => {
+app.post("/verificarCorreo", (req, res) => {//verifica si existe un correo
   const { correo } = req.body;
   pool
     .query("SELECT * FROM usuarios WHERE correo = $1", [correo])
@@ -160,11 +150,11 @@ app.post("/actualizarContrasena", (req, res) => {
     .catch((err) => res.status(500).json({ error: "Error al actualizar" }));
 });
 
-// ENVIAR CORREO RECUPERACIÓN / VERIFICACIÓN
+
 app.post("/generarCorreo", enviarCorreo);
 app.post("/generarCorreoVerificacion", enviarCorreoVerificacion);
 
-function enviarCorreo(req, res) {
+function enviarCorreo(req, res) {//envia el correo para la recuperacion de contraseña
   const { correo, codigo } = req.body;
   const sendSmtpEmail = {
     subject: "Recuperación de Contraseña",
@@ -185,7 +175,7 @@ function enviarCorreo(req, res) {
     });
 }
 
-function enviarCorreoVerificacion(req, res) {
+function enviarCorreoVerificacion(req, res) {//envia correo para la verificacion de la cuenta
   const { correo, codigo } = req.body;
   const sendSmtpEmail = {
     subject: "Verificación de cuenta",
@@ -206,7 +196,6 @@ function enviarCorreoVerificacion(req, res) {
     });
 }
 
-// PRODUCTOS
 app.post("/guardarProductos", (req, res) => {
   const { nombre, descripcion, cantidad, precio, usuario } = req.body;
   const query =
@@ -217,7 +206,7 @@ app.post("/guardarProductos", (req, res) => {
     .catch((err) => res.status(500).json({ error: "Error al guardar producto" }));
 });
 
-app.post("/editar", (req, res) => {
+app.post("/editar", (req, res) => {//edita productos
   const { nombre, descripcion, cantidad, precio, idTemp } = req.body;
   const query =
     "UPDATE productos SET nombre = $1, descripcion = $2, cantidad = $3, precio = $4 WHERE idproducto = $5";
@@ -227,20 +216,18 @@ app.post("/editar", (req, res) => {
     .catch((err) => res.status(500).json({ error: "Error al editar producto" }));
 });
 
-app.post("/productos", (req, res) => {
+app.post("/productos", (req, res) => {//obtiene todos los datos de la tabla productos
   const { usuario } = req.body;
-  
-  // Cambiar 'usuario' por 'idusuario' si la columna correcta es idusuario
   pool
     .query("SELECT * FROM productos WHERE idusuario = $1", [usuario])
     .then((results) => {
-      console.log("Productos obtenidos:", results.rows);  // Para depuración
+      console.log("Productos obtenidos:", results.rows);
       res.json(results.rows);
     })
     .catch((err) => res.status(500).json({ error: "Error al obtener productos", details: err }));
 });
 
-app.post("/editarMostrar", (req, res) => {
+app.post("/editarMostrar", (req, res) => {//obtiene un producto en especifico
   const { idProducto } = req.body;
   pool
     .query("SELECT * FROM productos WHERE idproducto = $1", [idProducto])
@@ -256,11 +243,8 @@ app.post("/eliminarProducto", (req, res) => {
     .catch((err) => res.status(500).json({ error: "Error al eliminar el producto" }));
 });
 
-// FACTURACIÓN
 app.post("/generarFactura", (req, res) => {
   const { fecha, montoTotal } = req.body;
-
-  // Insertamos la factura y obtenemos el idfactura generado automáticamente
   const query = `
     INSERT INTO facturas (fecha, montototal)
     VALUES ($1, $2)
@@ -269,7 +253,6 @@ app.post("/generarFactura", (req, res) => {
   pool
     .query(query, [fecha, montoTotal])
     .then((results) => {
-      // Si la inserción es exitosa, obtenemos el idfactura generado
       const idFactura = results.rows[0].idfactura;
       res.json({ message: "Factura generada correctamente", idFactura });
     })
@@ -279,7 +262,7 @@ app.post("/generarFactura", (req, res) => {
     });
 });
 
-app.post("/obtenerUltimo", (req, res) => {
+app.post("/obtenerUltimo", (req, res) => {//obtiene la ultima factura registrada
   pool
     .query("SELECT idfactura FROM facturas ORDER BY idfactura DESC LIMIT 1")
     .then((results) => {
@@ -294,8 +277,6 @@ app.post("/obtenerUltimo", (req, res) => {
 
 app.post("/generarFacturaDetallada", (req, res) => {
   const { idProducto, monto, cantidad, fkFactura, fkUsuario } = req.body;
-
-  // Insertar el detalle de la factura en facturasdetalladas
   const query = `
     INSERT INTO facturasdetalladas (fkproducto, monto, cantidad, fkfactura, fkusuario) 
     VALUES ($1, $2, $3, $4, $5)
@@ -308,34 +289,27 @@ app.post("/generarFacturaDetallada", (req, res) => {
     });
 });
 
-// PDF Generación
-app.post("/generarPDF", (req, res) => {
+app.post("/generarPDF", (req, res) => {//genera el pdf de la facturacion
   const { idFactura, fecha, montoTotal, productos } = req.body;
-
   const doc = new PDFDocument();
   const filePath = path.join(__dirname, `factura_${idFactura}.pdf`);
   const stream = fs.createWriteStream(filePath);
   doc.pipe(stream);
-
   doc.fontSize(18).text(`Factura #${idFactura}`, { align: "center" });
   doc.fontSize(12).text(`Fecha: ${fecha}`);
   doc.moveDown();
-
   productos.forEach(p => {
     doc.text(`${p.nombre} - Cantidad: ${p.cantidad} - Total: $${p.monto.toFixed(2)}`);
   });
-
   doc.moveDown().text(`Monto total: $${montoTotal.toFixed(2)}`, { align: "right" });
   doc.end();
-
   stream.on("finish", () => {
     res.sendFile(filePath, () => fs.unlinkSync(filePath));
   });
 });
 
-
 app.post("/obtenerFacturas", (req, res) => {
-  const { usuario } = req.body;  // Obtener el usuario desde el cuerpo de la solicitud
+  const { usuario } = req.body; 
 
   if (!usuario) {
     return res.status(400).json({ error: "Usuario es necesario." });
@@ -357,8 +331,8 @@ app.post("/obtenerFacturas", (req, res) => {
     });
 });
 
-app.post("/mayorProductoVendido", (req, res) => {
-  const { usuario } = req.body;  // Obtener el usuario del cuerpo de la solicitud
+app.post("/mayorProductoVendido", (req, res) => {//obtiene el producto mas vendido
+  const { usuario } = req.body;
 
   const query = `
     SELECT p.nombre, SUM(fd.cantidad) AS totalvendido
@@ -379,8 +353,8 @@ app.post("/mayorProductoVendido", (req, res) => {
     });
 });
 
-app.post("/ventasMensuales", (req, res) => {
-  const { usuario } = req.body;  // Obtener el usuario del cuerpo de la solicitud
+app.post("/ventasMensuales", (req, res) => {//obtiene la suma de las ventas mensuales
+  const { usuario } = req.body; 
 
   const query = `
     SELECT TO_CHAR(f.fecha, 'YYYY-MM') AS fecha, SUM(fd.monto) AS total
@@ -401,8 +375,8 @@ app.post("/ventasMensuales", (req, res) => {
     });
 });
 
-app.post("/ventasSemanales", (req, res) => {
-  const { usuario } = req.body;  // Obtener el usuario del cuerpo de la solicitud
+app.post("/ventasSemanales", (req, res) => {//obtiene la suma de las ventas semanales
+  const { usuario } = req.body;
 
   const query = `
     SELECT SUM(fd.monto) AS total

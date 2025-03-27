@@ -6,8 +6,8 @@ let numeroAleatorio="";
 
 function generarCorreos(event) {
     event.preventDefault(); 
-    correo = document.getElementById("correo").value.trim();
-    numeroAleatorio = Math.floor(10000 + Math.random() * 90000);
+    correo = document.getElementById("correo").value.trim();//correo a cual se va a dirigir 
+    numeroAleatorio = Math.floor(10000 + Math.random() * 90000);//cofigo que se va a enviar para luego validarlo
     if (!correo) {
         alert("⚠️ Por favor ingresa un correo válido");
         return;
@@ -16,7 +16,7 @@ function generarCorreos(event) {
     agregarCampoVerificacion();
 }
 
-function agregarCampoVerificacion() {
+function agregarCampoVerificacion() {//limpia la interfaz y agrega lo necesario para la validacion
     const container = document.getElementById("codigo-container");
     container.innerHTML = "";
     const container2 = document.getElementById("formularioRecuperacion");
@@ -37,7 +37,7 @@ function agregarCampoVerificacion() {
     container.appendChild(botonVerificar);
 }
 
-function verificarCodigo() {
+function verificarCodigo() {//verifica el codigo generado con el codigo puesto por el usuario
     let codigoIngresado = document.getElementById("codigoIngresado").value.trim();
     if (numeroAleatorio == codigoIngresado) {
         mostrarCampoNuevaContrasena();
@@ -46,7 +46,7 @@ function verificarCodigo() {
     }
 }
 
-function mostrarCampoNuevaContrasena() {
+function mostrarCampoNuevaContrasena() {//limpia la interfaz y agrega lo necesario para el cambio de contraseña
     const container = document.getElementById("codigo-container");
     container.innerHTML = "";
 
@@ -66,7 +66,7 @@ function mostrarCampoNuevaContrasena() {
     container.appendChild(botonGuardar);
 }
 
-function guardarNuevaContrasena() {
+function guardarNuevaContrasena() {//edita el usuario con la nueva contraseña
     let contrasena = document.getElementById("nuevaContrasena").value.trim();
     if (!contrasena) {
         alert("⚠️ Por favor ingresa una nueva contraseña.");
@@ -92,7 +92,7 @@ function guardarNuevaContrasena() {
     .catch(error => console.error("Error:", error));
 }
 
-function enviarCodigoPorCorreo(correo, codigo) {
+function enviarCodigoPorCorreo(correo, codigo) {//genera un correo con el codigo
     fetch("https://facturafast.onrender.com/generarCorreo", {
         method: "POST",
         headers: {

@@ -111,7 +111,7 @@ function changeTab(tabId) {
 
 //guarda los datos
 document.getElementById('productForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // Evitar recargar la página
+    event.preventDefault();
 
     let nombre = document.getElementById('productName').value;
     let descripcion = document.getElementById('productDescription').value;
@@ -247,7 +247,7 @@ function editProduct(idProducto) {
     .then(response => response.json())
     .then(data => {
         if (data.producto) { // Verificar que se recibió un producto
-            const product = data.producto; // Extraer el objeto producto
+            const product = data.producto;
             document.getElementById('productName').value = product.nombre;
             document.getElementById('productDescription').value = product.descripcion;
             document.getElementById('productQuantity').value = product.cantidad;
@@ -263,7 +263,7 @@ function editProduct(idProducto) {
 document.getElementById('invoiceForm').addEventListener('submit', agregarFactura);
 
 function agregarFactura(event) {
-    event.preventDefault(); // Evita que la página se recargue
+    event.preventDefault();
 
     let id = document.getElementById('productSelect').value;
     let cantidad = parseInt(document.getElementById('cantidadFacturacion').value);
@@ -313,15 +313,13 @@ function agregarFactura(event) {
         </span>
     `;
     listaFacturacion.appendChild(li);
-    
     listaFacturacion.appendChild(li);
-
+    //agrega productos a lista a facturar
     productosFacturar.push({ ...ProductoSeleccionado, cantidad });
-
+    //muestra el precio segun los productos
     let total = (totalAmount+(ProductoSeleccionado.precio*cantidad));
     console.log(total);
     totalAmountElement.textContent = total.toFixed(2);
-
     // Limpiar la cantidad ingresada después de agregar
     document.getElementById('cantidadFacturacion').value = "";
 }
@@ -329,6 +327,7 @@ function agregarFactura(event) {
 function editProductFacturacion(id) {
     let ProductoSeleccionado = productosFacturar.find(p => p.idproducto == id);
 
+    //validaciones
     if (!ProductoSeleccionado) {
         alert("Error: Producto no encontrado en la factura.");
         return;
@@ -346,7 +345,6 @@ function editProductFacturacion(id) {
         return;
     }
 
-    // Obtener el elemento HTML donde se muestra el total
     let totalAmountElement = document.getElementById('totalAmount'); 
 
     // Calcular el total antes de la modificación
@@ -379,8 +377,9 @@ function eliminarProductoFacturacion(id) {
 }
 
 function actualizarListaFacturacion() {
+    //Carga los datos facturados para poder verlos
     let listaFacturacion = document.getElementById('listaFacturacion');
-    listaFacturacion.innerHTML = ""; // Limpiar lista antes de actualizar
+    listaFacturacion.innerHTML = "";
 
     productosFacturar.forEach(producto => {
         let li = document.createElement('li');
@@ -407,12 +406,12 @@ async function generarFactura() {
         let montoTotal = parseFloat(totalAmountElement.textContent) || 0;
 
         let fechaHoy = new Date();
-        let fechaLocal = new Date(fechaHoy.getTime() - (6 * 60 * 60 * 1000)); // Ajuste para Costa Rica (UTC-6)
+        let fechaLocal = new Date(fechaHoy.getTime() - (6 * 60 * 60 * 1000)); // Ajuste para Costa Rica
         let fecha = fechaLocal.toISOString().split('T')[0]; 
 
         console.log("📅 Fecha formateada:", fecha);
 
-        let facturaResponse = await fetch("https://facturafast.onrender.com/generarFactura", {
+        let facturaResponse = await fetch("https://facturafast.onrender.com/generarFactura", {//genera una factura con los datos
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ fecha, montoTotal }) 
@@ -425,7 +424,7 @@ async function generarFactura() {
         }
 
         let fkFactura = -1;
-        let obtenerUltimaFactura = await fetch("https://facturafast.onrender.com/obtenerUltimo", {
+        let obtenerUltimaFactura = await fetch("https://facturafast.onrender.com/obtenerUltimo", {//obtiene el dato de la ultima factura para poder hacer la relacion con los productos
             method: "POST",
             headers: { "Content-Type": "application/json" }
         });
@@ -446,7 +445,7 @@ async function generarFactura() {
             let idTemp = producto.idproducto;
             let nuevaCantidadDisponible = Math.round(ProductoSeleccionado.cantidad - cantidad);
 
-            await fetch("https://facturafast.onrender.com/editar", {
+            await fetch("https://facturafast.onrender.com/editar", {//edita el inventario segun menos los productos facturados
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
@@ -461,7 +460,7 @@ async function generarFactura() {
             let idProducto = idTemp;
             let fkUsuario = localStorage.getItem("loggedInUser");
 
-            await fetch("https://facturafast.onrender.com/generarFacturaDetallada", {
+            await fetch("https://facturafast.onrender.com/generarFacturaDetallada", {//genera facturasdetalladas con relacion a facturas
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ idProducto, monto , cantidad, fkFactura, fkUsuario }) 
@@ -474,7 +473,7 @@ async function generarFactura() {
             });
         }
 
-        let pdfResponse = await fetch("https://facturafast.onrender.com/generarPDF", {
+        let pdfResponse = await fetch("https://facturafast.onrender.com/generarPDF", {//genera pdf con los datos de la factura
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ idFactura: fkFactura, fecha, montoTotal, productos: productosFactura })
@@ -526,17 +525,15 @@ function cargarFacturas() {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ usuario }) // Esto no es necesario con GET, puedes enviar usuario como query string
+        body: JSON.stringify({ usuario })
     })
     .then(response => response.json())
     .then(data => {
-        console.log("Datos recibidos:", data); // Verifica qué datos llegan
         let invoiceRecords = document.getElementById("invoiceRecords");
         invoiceRecords.innerHTML = "";  // Limpiar la lista
 
         // Dependiendo del filtro, mostrar los datos
-        if (filtro === "todas") {
-            // Verifica si hay datos y recorre las facturas
+        if (filtro === "todas") {//va a mostrar todas las facturas
             if (data.length > 0) {
                 data.forEach(factura => {
                     let li = document.createElement("li");
@@ -546,18 +543,16 @@ function cargarFacturas() {
             } else {
                 invoiceRecords.innerHTML = "No se encontraron facturas.";
             }
-        } else if (filtro === "masVendidos") {
-            // Muestra solo un producto si es el más vendido
+        } else if (filtro === "masVendidos") {//va a mostrar el producto mas vendido
             if (data.length > 0) {
-                let producto = data[0];  // Tomamos el primer producto si es único
+                let producto = data[0]; 
                 let li = document.createElement("li");
                 li.textContent = `Producto: ${producto.nombre} - Vendidos: ${producto.totalvendido}`;
                 invoiceRecords.appendChild(li);
             } else {
                 invoiceRecords.innerHTML = "No se encontraron productos más vendidos.";
             }
-        } else if (filtro === "mensual" || filtro === "semanal") {
-            // Verifica si hay ventas mensuales o semanales y recorre los datos
+        } else if (filtro === "mensual" || filtro === "semanal") {//muestra los montos totales segun las fechas
             if (data.length > 0) {
                 data.forEach(venta => {
                     let li = document.createElement("li");

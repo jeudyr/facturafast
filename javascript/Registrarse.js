@@ -10,11 +10,11 @@ document.getElementById('registrar').addEventListener('submit', generar);
 
 async function generar(event) {
     event.preventDefault();  
-    let validar = await mantenerDatos();
+    let validar = await mantenerDatos();//mantiene los datos y hace sus respectivas validaciones
     if(validar==false){
         return;
     } 
-    const Valido = await validarExistencia();
+    const Valido = await validarExistencia();//valida si el usuario y el correo ya han sido utilizados
     if (Valido==false){
         return;
     } 
@@ -24,7 +24,7 @@ async function generar(event) {
 
 
 function generarCorreos() {
-    codigo = Math.floor(10000 + Math.random() * 90000);
+    codigo = Math.floor(10000 + Math.random() * 90000);//codifo para la verificacion
     if (!correo) {
         alert("⚠️ Por favor ingresa un correo válido");
         return;
@@ -34,7 +34,7 @@ function generarCorreos() {
 }
 
 
-function enviarCodigoPorCorreo(correo, codigo) {
+function enviarCodigoPorCorreo(correo, codigo) {//genera un correo con el codigo
     fetch("https://facturafast.onrender.com/generarCorreoVerificacion", {
         method: "POST",
         headers: {
@@ -47,7 +47,7 @@ function enviarCodigoPorCorreo(correo, codigo) {
     .catch(error => console.error("Error al enviar correo:", error));
 }
 
-function agregarCampoVerificacion() {
+function agregarCampoVerificacion() {//actualiza la intefaz para la validacion
     const contain = document.getElementById("registrar");
     contain.innerHTML = "";
     const container = document.getElementById("codigo-container");
@@ -68,7 +68,7 @@ function agregarCampoVerificacion() {
     container.appendChild(botonVerificar);
 }
 
-function verificarCodigo() {
+function verificarCodigo() {//verifica el codigo generado con el puesto por el usuario
     let codigoIngresado = document.getElementById("codigoIngresado").value.trim();
     console.log(codigo);
     if (codigo == codigoIngresado) {
@@ -81,7 +81,7 @@ function verificarCodigo() {
 }
 
 async function mantenerDatos() {
-    event.preventDefault(); // Evitar recargar la página
+    event.preventDefault(); 
 
     usuario = document.getElementById('usuario').value;
     contrasena = document.getElementById('contrasena').value;
@@ -99,13 +99,13 @@ async function mantenerDatos() {
     // Expresión regular para validar el formato del correo
     let correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     
-    if (!correoValido.test(correo)) {
+    if (!correoValido.test(correo)) {//valida el correo
         alert("Por favor ingresa un correo electrónico válido");
         return false;
     }
 
     let celularValido = /^\d{8}$/;
-    if (!celularValido.test(celular)) {
+    if (!celularValido.test(celular)) {//valida el numero de celular
         alert("Por favor ingresa un número de celular válido de 8 dígitos");
         return false;
     }
@@ -113,7 +113,7 @@ async function mantenerDatos() {
     return true;
 }
 
-function guardarDatos(){
+function guardarDatos(){//guarda los datos a la tabla
     console.log("🔍 Datos a enviar:", { usuario, contrasena, nombre, apellidos, correo, celular });
     fetch("https://facturafast.onrender.com/usuarios", {
         method: "POST",
@@ -139,7 +139,7 @@ function guardarDatos(){
     });
 }
 
-async function validarExistencia() {
+async function validarExistencia() {//valida si ya existe el correo y el usuario
     const correoValido = await validarCorreo();
     
     if (correoValido==false){
