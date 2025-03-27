@@ -55,7 +55,7 @@ pool.connect((err, client, release) => {
     console.error("Error en la conexión a la BD:", err.stack);
     return;
   }
-  console.log("✅ Conexión exitosa a la base de datos");
+  console.log("Conexión exitosa a la base de datos");
   release();
 });
 
