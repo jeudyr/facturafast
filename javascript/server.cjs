@@ -1,5 +1,4 @@
 require('dotenv').config();
-
 const express = require("express");
 const { Pool } = require('pg'); 
 const cors = require("cors");
@@ -13,8 +12,7 @@ const apiKey = process.env.BREVO_API_KEY;
 SibApiV3Sdk.ApiClient.instance.authentications['api-key'].apiKey = apiKey;
 const app = express();
 
-// Inicialización de middlewares
-app.use(cors()); // Para permitir solicitudes de dominios cruzados
+app.use(cors());
 app.use(express.json()); // Para poder manejar datos JSON
 
 app.use("/css", express.static(path.join(__dirname, "../css"))); // ruta para archivos CSS
