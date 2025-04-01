@@ -2,6 +2,7 @@ document.getElementById('login').addEventListener('submit', function(event) {
     event.preventDefault();
 
     let usuario = document.getElementById('usuario').value;
+    let correo= usuario;
     let contrasena = document.getElementById('contrasena').value;
 
     console.log("🔍 Datos a enviar:", { usuario, contrasena });
@@ -13,6 +14,7 @@ document.getElementById('login').addEventListener('submit', function(event) {
         },
         body: JSON.stringify({
             usuario: usuario,
+            correo:correo,
             contrasena: contrasena
         })
     })
