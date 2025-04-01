@@ -55,7 +55,7 @@ function agregarCampoVerificacion() {//actualiza la intefaz para la validacion
     const inputCodigo = document.createElement("input");
     inputCodigo.type = "text";
     inputCodigo.id = "codigoIngresado";
-    inputCodigo.placeholder = "Ingrese el código";
+    inputCodigo.placeholder = "Ingrese el código enviado a el correo";
     
     // Crear botón de verificación
     const botonVerificar = document.createElement("button");
@@ -99,6 +99,11 @@ async function mantenerDatos() {
     // Expresión regular para validar el formato del correo
     let correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     
+    if (contrasena.length <= 6) {
+        alert("La contraseña debe tener más de 6 caracteres");
+        return false;
+    }
+
     if (!correoValido.test(correo)) {//valida el correo
         alert("Por favor ingresa un correo electrónico válido");
         return false;

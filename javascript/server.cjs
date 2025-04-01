@@ -69,7 +69,7 @@ app.listen(port, () => {
 app.post("/login", (req, res) => {//confirma si lo datos estan en la tabla para el login
   const { usuario, contrasena } = req.body;
 
-  const query = "SELECT * FROM usuarios WHERE usuario = $1 AND contrasena = $2";
+  const query = "SELECT * FROM usuarios WHERE (usuario = $1 OR correo = $1)  AND contrasena = $2";
 
   // Ejecutamos la consulta
   pool.query(query, [usuario, contrasena], (err, results) => {
