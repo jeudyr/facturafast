@@ -126,6 +126,20 @@ a {
     #tutulo_login {
         font-size: 0.8rem;
     }
+    registrar,
+    .recuperar-contenedor {
+        width: 90%;
+        max-width: 300px;
+        padding: 1.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .registrar input,
+    .formulario input {
+        width: 100%;
+        font-size: 0.9rem;
+        padding: 8px;
+    }
 }
 
 @media (min-width: 1024px) {
