@@ -121,6 +121,19 @@ a {
         margin-right: auto;
     }
 }
+
+@media (max-width: 480px) {
+    #tutulo_login {
+        font-size: 1.2rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    #login {
+        margin-left: auto;
+        margin-right: 10vw; /* lo empuja hacia la derecha */
+    }
+}
  
 .formulario input {
     padding: 10px;
