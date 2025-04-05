@@ -128,12 +128,13 @@ a {
     }
     .titulo {
         font-size: 1.4rem;
+        margin-top: 5vh; 
     }
     .subtitulo {
         font-size: 0.7rem;
     }
-    input, select, textarea {
-        font-size: 16px; /* Evita el zoom en móviles */
+    input{
+        font-size: 13px;
     }
     registrar,
     .recuperar-contenedor {
