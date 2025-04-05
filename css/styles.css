@@ -124,7 +124,7 @@ a {
 
 @media (max-width: 480px) {
     #tutulo_login {
-        font-size: 0.8rem;
+        font-size: 1.3rem;
     }
     .titulo {
         font-size: 1.4rem;
@@ -134,7 +134,7 @@ a {
         font-size: 0.7rem;
     }
     input{
-        font-size: 13px;
+        font-size: 16px;
     }
     registrar,
     .recuperar-contenedor {
