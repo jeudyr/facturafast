@@ -126,6 +126,9 @@ a {
     #tutulo_login {
         font-size: 0.8rem;
     }
+    .titulo {
+        font-size: 1rem;
+    }
     registrar,
     .recuperar-contenedor {
         width: 90%;
