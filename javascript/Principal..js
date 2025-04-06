@@ -468,7 +468,7 @@ async function generarFactura() {
             let idTemp = producto.idproducto;
             let nuevaCantidadDisponible;
             let tipo = producto.tipo;
-            if(!tipo=="servicio"){
+            if(tipo!="servicio"){
                 nuevaCantidadDisponible = Math.round(ProductoSeleccionado.cantidad - cantidad);
             }else{
                 nuevaCantidadDisponible = Math.round(ProductoSeleccionado.cantidad);
