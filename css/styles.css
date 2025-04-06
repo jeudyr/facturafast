@@ -299,17 +299,15 @@ a {
      color: white;
  }
 
- form select {
-    width: 100%;
+form input,
+form select {
+    display: block;
+    width: 80%;
+    margin: 10px auto;
     padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #776666;
     border-radius: 10px;
-    margin-bottom: 1.5rem;
+    border: 1px solid #776666;
+    font-size: 1rem;
     box-sizing: border-box;
-    background-color: white;
-    appearance: none; /* Elimina el estilo del sistema operativo */
-    -webkit-appearance: none;
-    -moz-appearance: none;
 }
 
