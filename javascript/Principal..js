@@ -206,18 +206,32 @@ function updateProductList() {
         productosLista.innerHTML = ""; 
         results.forEach((product) => {
             let li = document.createElement("li");
-            productos.push(product); 
-            li.innerHTML = `
+            productos.push(product);
+            if(product.tipo!="servicio"){
+                li.innerHTML = `
                 ${product.nombre} - ${product.descripcion} | 
                 Tipo: ${product.tipo} |  
                 Cantidad: ${product.cantidad} | 
-                Precio: $${parseFloat(product.precio).toFixed(2)}
+                Precio: ₡${parseFloat(product.precio).toFixed(2)}
                 <span class="button-container">
                 <button class="edit-button btn btn-edit" onclick="editProduct(${product.idproducto})">
                     📝
                 </button>
             </span>
             `;
+            }else{
+                li.innerHTML = `
+                ${product.nombre} - ${product.descripcion} | 
+                Tipo: ${product.tipo} |  
+                Precio: ₡${parseFloat(product.precio).toFixed(2)}
+                <span class="button-container">
+                <button class="edit-button btn btn-edit" onclick="editProduct(${product.idproducto})">
+                    📝
+                </button>
+            </span>
+            `;
+            }
+            
             productosLista.appendChild(li);
             let option = document.createElement('option');
             option.value = product.idproducto; 
@@ -323,7 +337,7 @@ function agregarFactura(event) {
 
     let li = document.createElement('li');
     li.innerHTML = `
-        ${ProductoSeleccionado.nombre} - ${ProductoSeleccionado.descripcion} | Cantidad: ${cantidad} | Precio: $${(ProductoSeleccionado.precio * cantidad).toFixed(2)}
+        ${ProductoSeleccionado.nombre} - ${ProductoSeleccionado.descripcion} | Cantidad: ${cantidad} | Precio: ₡${(ProductoSeleccionado.precio * cantidad).toFixed(2)}
         <span class="button-container">
             <button class="edit-button btn btn-edit" onclick="editProductFacturacion(${ProductoSeleccionado.idproducto})">
                 📝
@@ -357,13 +371,13 @@ function editProductFacturacion(id) {
     let nuevaCantidad = parseInt(prompt(`Introduzca la nueva cantidad para ${ProductoSeleccionado.nombre}:`, ProductoSeleccionado.cantidad));
 
     if (isNaN(nuevaCantidad) || nuevaCantidad <= 0) {
-        alert("⚠️ Cantidad inválida. Intente de nuevo.");
+        alert("Cantidad inválida. Intente de nuevo.");
         return;
     }
     let ProductoSeleccionado2 = productos.find(p => p.idproducto == id)
     if(ProductoSeleccionado2.tipo!="servicio"){
         if (nuevaCantidad > ProductoSeleccionado2.cantidad) {
-            alert("⚠️ La cantidad no puede exceder el inventario disponible.");
+            alert("La cantidad no puede exceder el inventario disponible.");
             return;
         }
     }
@@ -409,7 +423,7 @@ function actualizarListaFacturacion() {
         li.innerHTML = `
         ${producto.nombre} - ${producto.descripcion} | 
         Cantidad: ${producto.cantidad} | 
-        Precio: $${(producto.precio * producto.cantidad).toFixed(2)}
+        Precio: ₡${(producto.precio * producto.cantidad).toFixed(2)}
         <span class="button-container">
             <button class="edit-button btn btn-edit" onclick="editProductFacturacion(${producto.idproducto})">
                 📝
@@ -569,7 +583,7 @@ function cargarFacturas() {
                     let li = document.createElement("li");
                     let fechaOriginal = new Date(factura.fecha);
                     let fechaFormateada = fechaOriginal.toISOString().split('T')[0];
-                    li.textContent = `Factura #${factura.idfactura} - Total: $${factura.montototal} - Fecha: ${fechaFormateada}`;
+                    li.textContent = `Factura #${factura.idfactura} - Total: ₡${factura.montototal} - Fecha: ${fechaFormateada}`;
                     invoiceRecords.appendChild(li);
                 });
             } else {
@@ -589,9 +603,9 @@ function cargarFacturas() {
                 data.forEach(venta => {
                     let li = document.createElement("li");
                     if (filtro === "semanal") {
-                        li.textContent = `Esta semana - Total: $${venta.total}`;
+                        li.textContent = `Esta semana - Total: ₡${venta.total}`;
                     } else {
-                        li.textContent = `Fecha: ${venta.fecha} - Total: $${venta.total}`;
+                        li.textContent = `Fecha: ${venta.fecha} - Total: ₡${venta.total}`;
                     }
                     invoiceRecords.appendChild(li);
                 });

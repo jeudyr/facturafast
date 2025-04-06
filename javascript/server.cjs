@@ -297,7 +297,7 @@ app.post("/generarPDF", (req, res) => {//genera el pdf de la facturacion
   doc.fontSize(12).text(`Fecha: ${fecha}`);
   doc.moveDown();
   productos.forEach(p => {
-    doc.text(`${p.nombre} - Cantidad: ${p.cantidad} ${p.tipo} - Total: $${p.monto.toFixed(2)}`);
+    doc.text(`${p.nombre} - Cantidad: ${p.cantidad} ${p.tipo} - Total: ₡${p.monto.toFixed(2)}`);
   });
   doc.moveDown().text(`Monto total: $${montoTotal.toFixed(2)}`, { align: "right" });
   doc.end();
