@@ -512,6 +512,7 @@ async function generarFactura() {
 
             productosFactura.push({
                 nombre: producto.nombre,
+                tipo: producto.tipo, 
                 cantidad: producto.cantidad,
                 monto: producto.precio * producto.cantidad
             });
