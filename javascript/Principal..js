@@ -129,6 +129,9 @@ document.getElementById('productForm').addEventListener('submit', function(event
     let descripcion = document.getElementById('productDescription').value;
     let tipo = document.getElementById('productType').value;
     let cantidad = parseInt(document.getElementById('productQuantity').value);
+    if(!tipo=="servicio"){
+        cantidad=1;
+    }
     let precio = parseFloat(document.getElementById('productPrice').value);
     let usuario = localStorage.getItem("loggedInUser");
     console.log(usuario);
@@ -303,10 +306,13 @@ function agregarFactura(event) {
         return;
     }
 
-    if(ProductoSeleccionado.cantidad<cantidad){
-        alert("Cantidad sobrepasada del inventario.");
-        return;
+    if(ProductoSeleccionado.tipo!="servicio"){
+        if(ProductoSeleccionado.cantidad<cantidad){
+            alert("Cantidad sobrepasada del inventario.");
+            return;
+        }
     }
+    
 
     let productoEnLista = productosFacturar.find(p => p.idproducto == id);
 
@@ -355,11 +361,13 @@ function editProductFacturacion(id) {
         return;
     }
     let ProductoSeleccionado2 = productos.find(p => p.idproducto == id)
-    if (nuevaCantidad > ProductoSeleccionado2.cantidad) {
-        alert("⚠️ La cantidad no puede exceder el inventario disponible.");
-        return;
+    if(ProductoSeleccionado2.tipo!="servicio"){
+        if (nuevaCantidad > ProductoSeleccionado2.cantidad) {
+            alert("⚠️ La cantidad no puede exceder el inventario disponible.");
+            return;
+        }
     }
-
+    
     let totalAmountElement = document.getElementById('totalAmount'); 
 
     // Calcular el total antes de la modificación
@@ -458,8 +466,13 @@ async function generarFactura() {
             let cantidad = producto.cantidad;
             let monto = producto.precio * cantidad;
             let idTemp = producto.idproducto;
-            let nuevaCantidadDisponible = Math.round(ProductoSeleccionado.cantidad - cantidad);
+            let nuevaCantidadDisponible;
             let tipo = producto.tipo;
+            if(!tipo=="servicio"){
+                nuevaCantidadDisponible = Math.round(ProductoSeleccionado.cantidad - cantidad);
+            }else{
+                nuevaCantidadDisponible = Math.round(ProductoSeleccionado.cantidad);
+            }
 
             await fetch("https://facturafast.onrender.com/editar", {//edita el inventario segun menos los productos facturados
                 method: "POST",
