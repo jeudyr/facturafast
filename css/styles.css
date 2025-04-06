@@ -299,3 +299,17 @@ a {
      color: white;
  }
 
+ form select {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #776666;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    box-sizing: border-box;
+    background-color: white;
+    appearance: none; /* Elimina el estilo del sistema operativo */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
