@@ -195,21 +195,21 @@ function enviarCorreoVerificacion(req, res) {//envia correo para la verificacion
 }
 
 app.post("/guardarProductos", (req, res) => {
-  const { nombre, descripcion, cantidad, precio, usuario } = req.body;
+  const { nombre, descripcion, cantidad, precio, usuario, tipo } = req.body;
   const query =
-    "INSERT INTO productos (nombre, descripcion, cantidad, precio, idusuario) VALUES ($1, $2, $3, $4, $5)";
+    "INSERT INTO productos (nombre, descripcion, cantidad, precio, idusuario, tipo) VALUES ($1, $2, $3, $4, $5, $6)";
   pool
-    .query(query, [nombre, descripcion, cantidad, precio, usuario])
+    .query(query, [nombre, descripcion, cantidad, precio, usuario, tipo])
     .then(() => res.json({ message: "Producto guardado" }))
     .catch((err) => res.status(500).json({ error: "Error al guardar producto" }));
 });
 
 app.post("/editar", (req, res) => {//edita productos
-  const { nombre, descripcion, cantidad, precio, idTemp } = req.body;
+  const { nombre, descripcion, cantidad, precio, idTemp, tipo} = req.body;
   const query =
-    "UPDATE productos SET nombre = $1, descripcion = $2, cantidad = $3, precio = $4 WHERE idproducto = $5";
+    "UPDATE productos SET nombre = $1, descripcion = $2, cantidad = $3, precio = $4, tipo =$6 WHERE idproducto = $5";
   pool
-    .query(query, [nombre, descripcion, cantidad, precio, idTemp])
+    .query(query, [nombre, descripcion, cantidad, precio, idTemp, tipo])
     .then(() => res.json({ message: "Producto editado" }))
     .catch((err) => res.status(500).json({ error: "Error al editar producto" }));
 });
@@ -297,7 +297,7 @@ app.post("/generarPDF", (req, res) => {//genera el pdf de la facturacion
   doc.fontSize(12).text(`Fecha: ${fecha}`);
   doc.moveDown();
   productos.forEach(p => {
-    doc.text(`${p.nombre} - Cantidad: ${p.cantidad} - Total: $${p.monto.toFixed(2)}`);
+    doc.text(`${p.nombre} - Cantidad: ${p.cantidad} ${p.tipo} - Total: $${p.monto.toFixed(2)}`);
   });
   doc.moveDown().text(`Monto total: $${montoTotal.toFixed(2)}`, { align: "right" });
   doc.end();

@@ -109,18 +109,31 @@ function changeTab(tabId) {
 }
 
 
+document.getElementById("productType").addEventListener("change", function () {
+    const selectedType = this.value;
+    const quantityInput = document.getElementById("productQuantity");
+
+    if (selectedType === "servicio") {
+        quantityInput.disabled = true;
+        quantityInput.value = ''; //limpiar el valor
+    } else {
+        quantityInput.disabled = false;
+    }
+});
+
 //guarda los datos
 document.getElementById('productForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
     let nombre = document.getElementById('productName').value;
     let descripcion = document.getElementById('productDescription').value;
+    let tipo = document.getElementById('productType').value;
     let cantidad = parseInt(document.getElementById('productQuantity').value);
     let precio = parseFloat(document.getElementById('productPrice').value);
     let usuario = localStorage.getItem("loggedInUser");
     console.log(usuario);
 
-    if (!nombre || !descripcion || isNaN(cantidad) || isNaN(precio)) {
+    if (!nombre || !descripcion || !tipo || isNaN(cantidad) || isNaN(precio)) {
         alert("Todos los campos son obligatorios");
         return;
     }
@@ -130,7 +143,7 @@ document.getElementById('productForm').addEventListener('submit', function(event
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ nombre, descripcion, cantidad, precio, usuario}) 
+            body: JSON.stringify({ nombre, descripcion, tipo, cantidad, precio, usuario}) 
         })
         .then(response => response.json())
         .then(data => {
@@ -146,7 +159,7 @@ document.getElementById('productForm').addEventListener('submit', function(event
         fetch("https://facturafast.onrender.com/editar", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ nombre, descripcion, cantidad, precio, idTemp }) 
+            body: JSON.stringify({ nombre, descripcion, tipo, cantidad, precio, idTemp }) 
         })
         .then(response => response.json())
         .then(data => {
@@ -193,6 +206,7 @@ function updateProductList() {
             productos.push(product); 
             li.innerHTML = `
                 ${product.nombre} - ${product.descripcion} | 
+                Tipo: ${product.tipo} |  
                 Cantidad: ${product.cantidad} | 
                 Precio: $${parseFloat(product.precio).toFixed(2)}
                 <span class="button-container">
@@ -250,6 +264,7 @@ function editProduct(idProducto) {
             const product = data.producto;
             document.getElementById('productName').value = product.nombre;
             document.getElementById('productDescription').value = product.descripcion;
+            document.getElementById('productType').value = product.tipo;
             document.getElementById('productQuantity').value = product.cantidad;
             document.getElementById('productPrice').value = product.precio;
             idTemp=idProducto;
@@ -444,6 +459,7 @@ async function generarFactura() {
             let monto = producto.precio * cantidad;
             let idTemp = producto.idproducto;
             let nuevaCantidadDisponible = Math.round(ProductoSeleccionado.cantidad - cantidad);
+            let tipo = producto.tipo;
 
             await fetch("https://facturafast.onrender.com/editar", {//edita el inventario segun menos los productos facturados
                 method: "POST",
@@ -452,7 +468,8 @@ async function generarFactura() {
                     nombre: producto.nombre, 
                     descripcion: producto.descripcion, 
                     cantidad: nuevaCantidadDisponible, 
-                    precio: producto.precio, 
+                    precio: producto.precio,
+                    tipo: producto.tipo, 
                     idTemp 
                 })
             });

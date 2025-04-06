@@ -28,6 +28,20 @@
                 <form id="productForm">
                     <input type="text" id="productName" placeholder="Nombre del Producto" required>
                     <input type="text" id="productDescription" placeholder="Descripción" required>
+                    <select id="productType" required>
+                        <option value="">Seleccione tipo de unidad</option>
+                        <option value="unidad">Unidad</option>
+                        <option value="kilogramos">Kilogramos</option>
+                        <option value="gramos">Gramos</option>
+                        <option value="litros">Litros</option>
+                        <option value="mililitros">Mililitros</option>
+                        <option value="metros">Metros</option>
+                        <option value="centímetros">Centímetros</option>
+                        <option value="paquete">Paquete</option>
+                        <option value="caja">Caja</option>
+                        <option value="servicio">Servicio</option>
+                        <option value="otro">Otro</option>
+                    </select>
                     <input type="number" id="productQuantity" placeholder="Cantidad" required>
                     <input type="number" id="productPrice" placeholder="Precio" required>
                     <button type="submit">Agregar Producto</button>
