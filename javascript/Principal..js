@@ -567,7 +567,9 @@ function cargarFacturas() {
             if (data.length > 0) {
                 data.forEach(factura => {
                     let li = document.createElement("li");
-                    li.textContent = `Factura #${factura.idfactura} - Total: $${factura.montototal} - Fecha: ${factura.fecha}`;
+                    let fechaOriginal = new Date(factura.fecha);
+                    let fechaFormateada = fechaOriginal.toISOString().split('T')[0];
+                    li.textContent = `Factura #${factura.idfactura} - Total: $${factura.montototal} - Fecha: ${fechaFormateada}`;
                     invoiceRecords.appendChild(li);
                 });
             } else {
