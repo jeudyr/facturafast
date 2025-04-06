@@ -129,7 +129,7 @@ document.getElementById('productForm').addEventListener('submit', function(event
     let descripcion = document.getElementById('productDescription').value;
     let tipo = document.getElementById('productType').value;
     let cantidad = parseInt(document.getElementById('productQuantity').value);
-    if(tipo!="servicio"){
+    if(tipo=="servicio"){
         cantidad=1;
     }
     let precio = parseFloat(document.getElementById('productPrice').value);
