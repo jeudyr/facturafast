@@ -114,6 +114,22 @@ async function mantenerDatos() {
         alert("Por favor ingresa un número de celular válido de 8 dígitos");
         return false;
     }
+    let soloLetras = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+    if (!soloLetras.test(nombre)) {
+        alert("El nombre no debe contener números ni caracteres especiales");
+        return false;
+    }
+    nombre = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
+    // Validar y formatear apellidos (sin números, primeras letras en mayúscula)
+    if (!soloLetras.test(apellidos)) {
+        alert("Los apellidos no deben contener números ni caracteres especiales");
+        return false;
+    }
+    apellidos = apellidos
+        .split(" ")
+        .map(palabra => palabra.charAt(0).toUpperCase() + palabra.slice(1).toLowerCase())
+        .join(" ");
 
     return true;
 }
