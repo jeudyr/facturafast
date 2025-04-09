@@ -126,7 +126,9 @@ document.getElementById('productForm').addEventListener('submit', function(event
     event.preventDefault();
 
     let nombre = document.getElementById('productName').value;
+    nombre = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
     let descripcion = document.getElementById('productDescription').value;
+    descripcion = descripcion.charAt(0).toUpperCase() + descripcion.slice(1).toLowerCase();
     let tipo = document.getElementById('productType').value;
     let cantidad = parseInt(document.getElementById('productQuantity').value);
     if(tipo=="servicio"){

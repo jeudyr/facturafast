@@ -100,7 +100,7 @@ async function mantenerDatos() {
     let correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     
     if (contrasena.length <= 5 || contrasena.length >=30) {
-        alert("La contraseña no puede ser la digite, intente con otra");
+        alert("La contraseña no puede ser, intente con otra");
         return false;
     }
 
